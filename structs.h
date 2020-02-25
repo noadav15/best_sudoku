@@ -14,7 +14,7 @@ typedef struct{
 
 typedef struct{
 	int num_of_rows_in_block;
-	int num_of_colomns_in_block;
+	int num_of_columns_in_block;
 	int board_size;
 	int marked;
 	Cell **board;
