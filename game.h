@@ -10,5 +10,7 @@
 #include "structs.h"
 void intilizeEmptyBoard(Game *game);
 void printBoard(Game *game);
+int boardValueAreValid(Game *game);
+void freeGame(Game *game);
 
 #endif /* GAME_H_ */

@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "structs.h"
 
 /*print cell*/
@@ -14,13 +15,15 @@ void printCell(Cell *c){
 	if(c->value!=0){
 		int value= c->value;
 		if(c->fixed==1){
-			printf("  %2d. ",value);
+			printf(" %2d.",value);
 		}
 		else{
 			if(c->invalid==1){
-				printf("  %2d* ",value);
+				printf(" %2d*",value);
 			}
-			printf("  %2d ",value);
+			else{
+				printf(" %2d ",value);
+			}
 		}
 	}
 	else{
@@ -68,9 +71,9 @@ void intilizeEmptyCell(Cell *c){
 /*Create an empty board game*/
 void intilizeEmptyBoard(Game *game){
 	int i=1,j=1;
-	game->board = malloc(game->board_size*sizeof(Cell*));
+	game->board = (Cell**)malloc((game->board_size+1)*sizeof(Cell*));
 	for(i=1;i<=game->board_size;i++){
-		game->board[i]=malloc(game->board_size*sizeof(Cell));
+		game->board[i]=(Cell*)malloc((game->board_size+1)*sizeof(Cell));
 	}
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
@@ -86,7 +89,7 @@ void intilizeEmptyBoard(Game *game){
 int checkRowValid(int row ,Game *game){
 	int i=1;
 	int value;
-	int *arr = calloc(game->board_size+1,sizeof(int));
+	int *arr = (int*)calloc(game->board_size+1,sizeof(int));
 	for(i=1;i<=game->board_size;i++){
 		if(game->board[row][i].value!=0){
 			value=game->board[row][i].value;
@@ -108,7 +111,7 @@ int checkRowValid(int row ,Game *game){
 int checkColumnValid(int column,Game *game){
 	int i=1;
 	int value;
-	int *arr = calloc(game->board_size+1,sizeof(int));
+	int *arr =(int*) calloc(game->board_size+1,sizeof(int));
 	for(i=1;i<=game->board_size;i++){
 		if(game->board[i][column].value!=0){
 			value=game->board[i][column].value;
@@ -128,15 +131,14 @@ int checkColumnValid(int column,Game *game){
  * return 1 if valid, else return 0
  */
 int checkBlockValid(int row,int column,Game *game){
-	int i,j,value,k=0;
-	int *arr = calloc(game->board_size+1,sizeof(int));
-	for(i=row;i<=row+game->num_of_rows_in_block;i++){
-		for(j=column;j<=column+game->num_of_columns_in_block;j++){
+	int i,j,value;
+	int *arr =(int*) calloc(game->board_size+1,sizeof(int));
+	for(i=row;i<row+game->num_of_rows_in_block;i++){
+		for(j=column;j<column+game->num_of_columns_in_block;j++){
 			if(game->board[i][j].value!=0){
 				value=game->board[i][j].value;
 				arr[value]++;
 			}
-			k++;
 		}
 	}
 	for(i=1;i<=game->board_size;i++){
@@ -167,11 +169,19 @@ int boardValueAreValid(Game *game){
 	}
 	for(i=1;i<=game->board_size;i=i+game->num_of_columns_in_block){
 		for(j=1;j<=game->board_size;j=j+game->num_of_rows_in_block){
-			correct=checkBlockValid(i, j, game);
+			correct=checkBlockValid(j, i, game);
 			if(correct==0){
 				return 0;
 			}
 		}
 	}
 	return 1;
+}
+void freeGame(Game *game){
+	int i;
+	for(i=1;i<=game->board_size;i++){
+		free(game->board[i]);
+	}
+	free(game->board);
+	free(game);
 }
