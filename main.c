@@ -10,29 +10,37 @@
 #include "solve.h"
 #include "structs.h"
 #include "SPBufferset.h"
+#include "linkedList.h"
 int main(){
-	int count=0;
-	Game *game=(Game*)malloc(sizeof(Game));
-	SP_BUFF_SET();
-	game->num_of_columns_in_block=2;
-	game->num_of_rows_in_block=2;
-	game->board_size=4;
-	intilizeEmptyBoard(game);
-	/*game->board[2][4].value=5;
-	game->board[2][4].fixed=1;
-	game->board[2][5].value=4;
-	game->board[2][5].invalid=1;
-	printBoard(game);
-	valid= boardValueAreValid(game);
-	printf("\n%d " ,valid);*/
-	printBoard(game);
-	count= fillTheBoard(game);
-	printBoard(game);
-	printf("%d=",count);
-	freeGame(game);
+	MoveList *list = createList();
+	Move *cur;
+		insertToList(list, 10, 11, 0, 13, 1, 1);
+		insertToList(list, 10, 11, 0, 10, 1, 0);
+		insertToList(list, 10, 11, 0, 11, 1, 0);
+		insertToList(list, 10, 11, 0, 20, 1, 0);
+		insertToList(list, 10, 11, 0, 34, 1, 1);
+		insertToList(list, 10, 11, 0, 12, 1, 1);
+		insertToList(list, 10, 11, 0, 7, 1, 1);
+		insertToList(list, 10, 11, 0, 3, 1, 0);
+		insertToList(list, 10, 11, 0, 2, 1, 1);
+		insertToList(list, 10, 11, 0, 1, 1, 0);
+		cur = undo(list);
+		printf("%d\n", cur->value);
+		cur = undo(list);
+		printf("%d\n", cur->value);
+		cur = redo(list);
+		printf("%d\n", cur->value);
+		cur = redo(list);
+		printf("%d\n", cur->value);
+		cur = redo(list);
+		if(cur == NULL){
+			printf("good");
+		}
+		clearList(list);
+		printf("done");
+		return 0;
 
 
-	return 0;
 
 }
 

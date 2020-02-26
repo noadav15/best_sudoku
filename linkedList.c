@@ -54,40 +54,66 @@ void clearList(MoveList *list){
 
 void clearListUndone(MoveList *list){
 	Move *temp = list->cur_move;
+	Move *ref = list->cur_move;
 	while(temp->next != NULL){
 		temp = temp->next;
 	}
-	while(temp != list->cur_move){
+	while(ref->next != NULL){
+		if(ref->next->move_start){
+			break;
+		}
+		ref = ref->next;
+
+	}
+	while(temp != ref){
 		temp = temp->prev;
 		free(temp->next);
 	}
-	if(temp->next != NULL){
-		free(temp->next);
+	if(ref->next != NULL){
+		free(ref->next);
 	}
 
 }
-void insert(MoveList *list, int row, int column, int invalid, int value, int fixed, int move_start){
+void insertToList(MoveList *list, int row, int column, int invalid, int value, int fixed, int move_start){
+	Move *temp;
 	Move *move = createMove(row, column, invalid, value, fixed, move_start);
 	clearListUndone(list);
-	list->cur_move->next = move;
-	move->prev = list->cur_move;
+	temp = list->cur_move;
+	while(temp->next != NULL){
+		temp = temp->next;
+	}
+	move->prev = temp;
+	temp->next = move;
+	if(move->move_start){
+		list->cur_move = move;
+	}
 }
 
 Move* undo(MoveList *list){
-	Move* temp;
-	if(list->cur_move->edge){
+	Move* ret = list->cur_move;
+	if(ret->edge){
 		return NULL;
 	}
-	temp = list->cur_move;
-	list->cur_move = temp->prev;
-	return temp;
+	list->cur_move = list->cur_move->prev;
+	while(!list->cur_move->move_start){
+		list->cur_move = list->cur_move->prev;
+	}
+	return ret;
 }
 
 Move* redo(MoveList *list){
-	if(list->cur_move->next == NULL){
+	Move *temp = list->cur_move;
+	temp = temp->next;
+	if(temp == NULL){
 		return NULL;
 	}
-	list->cur_move = list->cur_move->next;
-	return list->cur_move;
+	while(!temp->move_start){
+		temp = temp->next;
+		if(temp == NULL){
+			return NULL;
+		}
+	}
+	list->cur_move = temp;
+	return temp;
 }
 

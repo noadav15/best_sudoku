@@ -177,6 +177,31 @@ int boardValueAreValid(Game *game){
 	}
 	return 1;
 }
+
+/*sets cell in game board (z > 0)
+ * if illegal input and returns returns 0
+ * if cell is fixed prints: cell is fixed and returns 0
+ * if cell exists in one of it's neighbors prints: value is invalid and returns 0
+ * otherwise, keeps the cell and returns 1
+ * */
+int setCell(int x, int y, int z, Game *game){
+	int prev_cell_value;
+	int valid_insertion = 0;
+	if((game->board)[y][x].fixed){
+		printf("Error: cell is fixed\n");
+		return 0;
+	}
+	prev_cell_value = (game->board)[y][x].value;
+	(game->board)[y][x].value = z;
+	valid_insertion = boardValueAreValid(game);
+	if(!valid_insertion){
+		(game->board)[y][x].value = prev_cell_value;
+		printf("Error: value is invalid\n");
+		return 0;
+	}
+	return 1;
+}
+
 void freeGame(Game *game){
 	int i;
 	for(i=1;i<=game->board_size;i++){
