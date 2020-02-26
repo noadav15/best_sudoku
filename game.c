@@ -208,7 +208,7 @@ void setCell(int x, int y, int z, Game *game, int start){
 		printf("Error: column number is incorrect\n");
 	}
 	if(x > game->board_size || x < 1){
-			printf("Error: row number is incorrect\n");
+		printf("Error: row number is incorrect\n");
 	}
 
 	if(z > max_value || z < 0){
@@ -293,5 +293,36 @@ void freeGame(Game *game){
 	}
 	free(game->board);
 	free(game);
+}
+void markInvalidCells(Game *game, int row, int column){
+	int value= game->board[row][column].value;
+	int i=1,j=1;
+	for(i=1;i<=game->board_size;i++){
+		if(i!=column){
+			if(game->board[row][i].value==value){
+				game->board[row][column].invalid=1;
+				game->board[row][i].invalid=1;
+			}
+		}
+	}
+	for(i=1;i<=game->board_size;i++){
+		if(i!=row){
+			if(game->board[i][column].value==value){
+				game->board[row][column].invalid=1;
+				game->board[i][column].invalid=1;
+			}
+		}
+	}
+	for(i=row- row%game->num_of_rows_in_block +1; i<=game->num_of_rows_in_block;i++){
+		for(j=column- row%game->num_of_columns_in_block +1; j<=game->num_of_columns_in_block;j++){
+			if(i!=row || j!=column){
+				if(game->board[i][column].value==value){
+					game->board[row][column].invalid=1;
+					game->board[i][column].invalid=1;
+				}
+			}
+		}
+	}
+
 }
 

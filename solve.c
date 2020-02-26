@@ -78,7 +78,7 @@ int stillHasOptionForCell(int *arr_of_options, Game *game){
 }
 /*backtracking algorithm as we saw at class
  * return 1 if there a solution else return 0 */
-int backTracking(int i, int j,int start_index_row,int start_index_column, Game *game){
+int backTracking(int i, int j, Game *game){
 	Stack *stack= stackCreate();
 	StackNode *node;
 	int going_back=0;
@@ -186,7 +186,7 @@ int fillTheBoard(Game *game){
 		}
 	}
 
-	return backTracking(start_index_row,start_index_column,start_index_row,start_index_column,game);
+	return backTracking(start_index_row,start_index_column,game);
 
 
 }

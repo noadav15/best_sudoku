@@ -17,4 +17,5 @@ void setCell(int x, int y, int z, Game *game, int start);
 void undoMove(Game *game);
 void redoMove(Game *game);
 void resetBoard(Game *game);
+void markInvalidCells(Game *game, int row, int column);
 #endif /* GAME_H_ */
