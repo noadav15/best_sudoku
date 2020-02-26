@@ -12,5 +12,6 @@ void intilizeEmptyBoard(Game *game);
 void printBoard(Game *game);
 int boardValueAreValid(Game *game);
 void freeGame(Game *game);
+void intilizeEmptyCell(Cell *c);
 
 #endif /* GAME_H_ */

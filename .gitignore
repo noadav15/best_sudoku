@@ -5,3 +5,5 @@
 
 .settings/
 /Debug/
+
+main.c
