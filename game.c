@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "structs.h"
+#include "linkedList.h"
 
 /*print cell*/
 void printCell(Cell *c){
@@ -83,6 +84,17 @@ void intilizeEmptyBoard(Game *game){
 
 }
 
+Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block, int mark_errors, enum status cur_status){
+	Game *game = (Game*)malloc(sizeof(Game));
+	game->num_of_columns_in_block = num_of_rows_in_block;
+	game->num_of_rows_in_block = num_of_columns_in_block;
+	game->board_size = num_of_rows_in_block * num_of_columns_in_block;
+	game->mark_errors = mark_errors;
+	game->cur_status = cur_status;
+	game->move_history = createList();
+	intilizeEmptyBoard(game);
+	return game;
+}
 /*check if the game board current row values are valid
  * return 1 if valid, else return 0
  */
@@ -178,28 +190,100 @@ int boardValueAreValid(Game *game){
 	return 1;
 }
 
+
 /*sets cell in game board (z > 0)
  * if illegal input and returns returns 0
  * if cell is fixed prints: cell is fixed and returns 0
  * if cell exists in one of it's neighbors prints: value is invalid and returns 0
  * otherwise, keeps the cell and returns 1
  * */
-int setCell(int x, int y, int z, Game *game){
-	int prev_cell_value;
-	int valid_insertion = 0;
-	if((game->board)[y][x].fixed){
-		printf("Error: cell is fixed\n");
-		return 0;
+void setCell(int x, int y, int z, Game *game, int start){
+	Cell cur_cell;
+	int max_value = game->num_of_columns_in_block*game->num_of_rows_in_block;
+	if(game->cur_status == Init){
+		printf("Error: Set isn't available in Init mode\n");
+		return;
 	}
-	prev_cell_value = (game->board)[y][x].value;
+	if(y > game->board_size || y < 1){
+		printf("Error: column number is incorrect\n");
+	}
+	if(x > game->board_size || x < 1){
+			printf("Error: row number is incorrect\n");
+	}
+
+	if(z > max_value || z < 0){
+		printf("Error: value is invalid, must be between %d and %d\n", 0, max_value);
+	}
+	if((game->board)[y][x].fixed && game->cur_status == Solve){
+		printf("Error: cell is fixed, can't change fixed cells in Solve mode\n");
+		return;
+	}
+	cur_cell = (game->board)[y][x];
+	insertToList(game->move_history, y, x, cur_cell.invalid, cur_cell.value, z, cur_cell.fixed, start);
 	(game->board)[y][x].value = z;
-	valid_insertion = boardValueAreValid(game);
-	if(!valid_insertion){
-		(game->board)[y][x].value = prev_cell_value;
-		printf("Error: value is invalid\n");
-		return 0;
+	boardValueAreValid(game);
+
+}
+
+void setCellsByMove(Game *game, Move *move, int undo){
+	while(move->next != NULL && !move->next->move_start){
+		move = move->next;
 	}
-	return 1;
+	while(1){
+		int y = move->row;
+		int x = move->column;
+		if(undo){
+			(game->board)[y][x].value = move->before_value;
+		}
+		else{
+			(game->board)[y][x].value = move->after_value;
+		}
+		(game->board)[y][x].fixed = move->fixed;
+		(game->board)[y][x].invalid = move->invalid;
+		if(move->move_start){
+			break;
+		}
+		move = move->prev;
+	}
+}
+
+void undoMove(Game *game){
+	Move *move = undo(game->move_history);
+	if(move == NULL){
+		printf("Error: no moves to undo\n");
+		return;
+	}
+	setCellsByMove(game, move, 1);
+
+}
+
+void redoMove(Game *game){
+	Move *move = redo(game->move_history);
+	if(move == NULL){
+		printf("Error: no moves to redo\n");
+		return;
+	}
+	setCellsByMove(game, move, 0);
+}
+
+void resetBoard(Game *game){
+	Move *move = undo(game->move_history);
+	while(move != NULL){
+		setCellsByMove(game, move, 1);
+		move = undo(game->move_history);
+	}
+}
+
+void fixCellsWithValues(Game *game){
+	int i, j;
+	for(i=1;i<=game->board_size;i++){
+		for(j=1;j<=game->board_size;j++){
+			if((game->board)[i][j].value != 0){
+				(game->board)[i][j].fixed = 1;
+			}
+		}
+	}
+
 }
 
 void freeGame(Game *game){
@@ -210,3 +294,4 @@ void freeGame(Game *game){
 	free(game->board);
 	free(game);
 }
+

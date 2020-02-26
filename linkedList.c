@@ -22,14 +22,15 @@ MoveList* createList(){
 	return list;
 }
 
-Move* createMove(int row, int column, int invalid, int value, int fixed, int move_start){
+Move* createMove(int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
 	Move *move = (Move*)malloc(sizeof(Move));
 	move->column = column;
 	move->row = row;
 	move->fixed = fixed;
 	move->move_start = move_start;
 	move->invalid = invalid;
-	move->value = value;
+	move->before_value = before_value;
+	move->after_value = after_value;
 	move->next = NULL;
 	move->prev = NULL;
 	move->edge = 0;
@@ -74,9 +75,9 @@ void clearListUndone(MoveList *list){
 	}
 
 }
-void insertToList(MoveList *list, int row, int column, int invalid, int value, int fixed, int move_start){
+void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
 	Move *temp;
-	Move *move = createMove(row, column, invalid, value, fixed, move_start);
+	Move *move = createMove(row, column, invalid, before_value, after_value, fixed, move_start);
 	clearListUndone(list);
 	temp = list->cur_move;
 	while(temp->next != NULL){
@@ -95,7 +96,7 @@ Move* undo(MoveList *list){
 		return NULL;
 	}
 	list->cur_move = list->cur_move->prev;
-	while(!list->cur_move->move_start){
+	while(!list->cur_move->move_start && !list->cur_move->edge){
 		list->cur_move = list->cur_move->prev;
 	}
 	return ret;
@@ -116,4 +117,5 @@ Move* redo(MoveList *list){
 	list->cur_move = temp;
 	return temp;
 }
+
 

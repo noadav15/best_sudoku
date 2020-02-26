@@ -6,6 +6,7 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 #include "linkedList.h"
+enum status{Init, Edit, Solve};
 
 typedef struct{
 	int invalid;
@@ -17,8 +18,9 @@ typedef struct{
 	int num_of_rows_in_block;
 	int num_of_columns_in_block;
 	int board_size;
-	int marked;
-	MoveList move_history;
+	int mark_errors;
+	enum status cur_status;
+	MoveList *move_history;
 	Cell **board;
 	} Game;
 
