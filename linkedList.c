@@ -30,6 +30,10 @@ MoveList* createList(){
 
 Move* createMove(int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
 	Move *move = (Move*)malloc(sizeof(Move));
+	if(move == NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	move->column = column;
 	move->row = row;
 	move->fixed = fixed;
@@ -79,6 +83,7 @@ void clearListUndone(MoveList *list){
 	if(ref->next != NULL){
 		free(ref->next);
 	}
+	ref->next = NULL;
 
 }
 void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
