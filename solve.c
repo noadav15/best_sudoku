@@ -7,10 +7,12 @@
 #include "structs.h"
 #include <stdlib.h>
 #include "game.h"
+#include "solve.h"
 #include "stack.h"
 /*get an array and game board and update the array- array[i]==0 -> i is an valid number to the cell, else i is unvalid option
  *
  */
+
 void fillArrWithOption(int *arr_of_options,Game *game,int row,int column){
 	int i,j,value1=0,value2;
 	int column_start_point;
@@ -105,16 +107,19 @@ int backTracking(int i, int j, Game *game){
 						arr_of_options=node->arr_of_options;
 						intilizeEmptyCell(&game->board[i][j]);
 						going_back=1;
-
+						free(node);
 					}
 				}
 			}
 		}
 		/*should fill the cell*/
 		else{
-			printBoard(game);
 			if(going_back==0){
 				arr_of_options=(int*)calloc(game->board_size+1,sizeof(int));
+				if(arr_of_options==NULL){
+					printf("ERROR: problem with memory allocation\n");
+					exit(0);
+				}
 				fillArrWithOption(arr_of_options,game,i,j);
 			}
 			succeed= fillCellByAlgo(i,j,game,arr_of_options);
@@ -145,11 +150,13 @@ int backTracking(int i, int j, Game *game){
 							arr_of_options=node->arr_of_options;
 							intilizeEmptyCell(&game->board[i][j]);
 							going_back=1;
+							free(node);
 						}
 					}
 				}
 			}
 			else{
+				free(arr_of_options);
 				if(stackSize(stack)>0){
 					node= stackPop(stack);
 					i=node->i;
@@ -158,21 +165,23 @@ int backTracking(int i, int j, Game *game){
 					arr_of_options[game->board[i][j].value]++;
 					intilizeEmptyCell(&game->board[i][j]);
 					going_back=1;
-
+					free(node);
 				}
 				else{
+					stackDestroy(stack);
 					return count;
 				}
 			}
 		}
 	}
+	/*should never be here*/;
 	return count;
 }
 /*algorithem Deterministic
  * get board and return 1 if there a solution to the board and update the board
  * if there no solution return 0
  */
-int fillTheBoard(Game *game){
+int countSolutions(Game *game){
 	int i=1,j=1, start_index_row, start_index_column, check=0;
 	for(i=1;i<=game->board_size && check ==0;i++){
 		for(j=1;j<=game->board_size && check ==0;j++){

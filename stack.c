@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stack.h"
+#include "solve.h"
 
 
 struct Stack {
@@ -20,9 +21,10 @@ Stack *stackCreate()
 {
 	/* Create a stack and set everything to the default values. */
 	Stack *stack = (Stack *) malloc(sizeof(stack));
-	if(stack == 0)
-		return 0;
-
+	if(stack==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	stack->count = 0;
 	stack->top = 0;
 
@@ -35,10 +37,14 @@ void stackDestroy(Stack *stack)
 	free(stack);
 }
 
-void stackClean(Stack *stack)
-{
-	while(stackSize(stack)>0)
-		stackPop(stack);
+void stackClean(Stack *stack){
+
+	StackNode *node;
+	while(stackSize(stack)>0){
+		node = stackPop(stack);
+		free(node->arr_of_options);
+		free(node);
+	}
 }
 
 size_t stackSize(Stack *stack)
@@ -54,9 +60,10 @@ StackNode *stackTop(Stack *stack)
 bool stackPush(Stack *stack, int i, int j, int *arr_of_options)
 {
 	StackNode *newNode = (StackNode *) malloc(sizeof *newNode);
-	if(newNode == 0)
-		return false;
-
+	if(newNode==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	newNode->arr_of_options=arr_of_options;
 	newNode->i=i;
 	newNode->j=j;
@@ -72,7 +79,6 @@ StackNode *stackPop(Stack *stack)
 	StackNode *oldTop;
 	oldTop = stack->top;
 	stack->top = oldTop->next;
-	/*free(oldTop);*/
 	stack->count -= 1;
 	return oldTop;
 }

@@ -10,16 +10,18 @@
 #include <string.h>
 #include "structs.h"
 #include "linkedList.h"
+#include "solve.h"
+
 
 /*print cell*/
-void printCell(Cell *c){
+void printCell(Cell *c, Game *game){
 	if(c->value!=0){
 		int value= c->value;
 		if(c->fixed==1){
 			printf(" %2d.",value);
 		}
 		else{
-			if(c->invalid==1){
+			if(c->invalid==1 && game->mark_errors==1 ){
 				printf(" %2d*",value);
 			}
 			else{
@@ -48,7 +50,7 @@ void printBlockRow(int i, Game *game){
 			if(j%game->num_of_columns_in_block==1){
 				printf("|");
 			}
-			printCell(&(game->board[k][j]));
+			printCell(&(game->board[k][j]), game);
 		}
 		printf("|\n");
 	}
@@ -73,8 +75,16 @@ void intilizeEmptyCell(Cell *c){
 void intilizeEmptyBoard(Game *game){
 	int i=1,j=1;
 	game->board = (Cell**)malloc((game->board_size+1)*sizeof(Cell*));
+	if(game->board==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	for(i=1;i<=game->board_size;i++){
 		game->board[i]=(Cell*)malloc((game->board_size+1)*sizeof(Cell));
+		if(game->board[i]==NULL){
+			printf("ERROR: problem with memory allocation\n");
+			exit(0);
+		}
 	}
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
@@ -86,6 +96,10 @@ void intilizeEmptyBoard(Game *game){
 
 Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block, int mark_errors, enum status cur_status){
 	Game *game = (Game*)malloc(sizeof(Game));
+	if(game==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	game->num_of_columns_in_block = num_of_rows_in_block;
 	game->num_of_rows_in_block = num_of_columns_in_block;
 	game->board_size = num_of_rows_in_block * num_of_columns_in_block;
@@ -102,6 +116,10 @@ int checkRowValid(int row ,Game *game){
 	int i=1;
 	int value;
 	int *arr = (int*)calloc(game->board_size+1,sizeof(int));
+	if(arr==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	for(i=1;i<=game->board_size;i++){
 		if(game->board[row][i].value!=0){
 			value=game->board[row][i].value;
@@ -124,6 +142,10 @@ int checkColumnValid(int column,Game *game){
 	int i=1;
 	int value;
 	int *arr =(int*) calloc(game->board_size+1,sizeof(int));
+	if(arr==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	for(i=1;i<=game->board_size;i++){
 		if(game->board[i][column].value!=0){
 			value=game->board[i][column].value;
@@ -145,6 +167,10 @@ int checkColumnValid(int column,Game *game){
 int checkBlockValid(int row,int column,Game *game){
 	int i,j,value;
 	int *arr =(int*) calloc(game->board_size+1,sizeof(int));
+	if(arr==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	for(i=row;i<row+game->num_of_rows_in_block;i++){
 		for(j=column;j<column+game->num_of_columns_in_block;j++){
 			if(game->board[i][j].value!=0){
@@ -294,35 +320,114 @@ void freeGame(Game *game){
 	free(game->board);
 	free(game);
 }
-void markInvalidCells(Game *game, int row, int column){
-	int value= game->board[row][column].value;
-	int i=1,j=1;
-	for(i=1;i<=game->board_size;i++){
-		if(i!=column){
-			if(game->board[row][i].value==value){
-				game->board[row][column].invalid=1;
-				game->board[row][i].invalid=1;
+
+int invalidCell(Game *game, int row , int column){
+	int i,j,start_i,start_j,value;
+	value=game->board[row][column].value;
+	if(value==0){
+		return 0;
+	}
+	else{
+		for(i=1;i<=game->board_size;i++){
+			if(i!=column){
+				if(game->board[row][i].value==value){
+					return 1;
+				}
 			}
 		}
-	}
-	for(i=1;i<=game->board_size;i++){
-		if(i!=row){
-			if(game->board[i][column].value==value){
-				game->board[row][column].invalid=1;
-				game->board[i][column].invalid=1;
-			}
-		}
-	}
-	for(i=row- row%game->num_of_rows_in_block +1; i<=game->num_of_rows_in_block;i++){
-		for(j=column- row%game->num_of_columns_in_block +1; j<=game->num_of_columns_in_block;j++){
-			if(i!=row || j!=column){
+		for(i=1;i<=game->board_size;i++){
+			if(i!=row){
 				if(game->board[i][column].value==value){
-					game->board[row][column].invalid=1;
-					game->board[i][column].invalid=1;
+					return 1;
+				}
+			}
+		}
+		if( row%game->num_of_rows_in_block!=0){
+			start_i=row- row%game->num_of_rows_in_block +1;
+		}
+		else{
+			start_i=row-game->num_of_rows_in_block +1;
+		}
+		if( row%game->num_of_columns_in_block!=0){
+			start_j=column- row%game->num_of_columns_in_block +1;
+		}
+		else{
+			start_i=row-game->num_of_columns_in_block +1;
+		}
+		for(i=start_i; i<start_i+game->num_of_rows_in_block;i++){
+			for(j=start_j; j<start_j+game->num_of_columns_in_block;j++){
+				if(i!=row || j!=column){
+					if(game->board[i][j].value==value){
+						return 1;
+					}
 				}
 			}
 		}
 	}
-
+	return 0;
 }
+void markInvalidCells(Game *game){
+	int i, j;
+	for(i=1;i<=game->board_size;i++){
+		for(j=1;j<=game->board_size;j++){
+			game->board[i][j].invalid=invalidCell(game,i,j);
 
+		}
+	}
+}
+int oneValidOption(int *arr,Game *game){
+	int count=0,i=1,value=0;
+	for (i=1; i<= game->board_size;i++){
+		if(arr[i]==0){
+			count++;
+			value=i;
+		}
+	}
+	if(count==1){
+		return value;
+	}
+	return 0;
+}
+void copyGame(Game *game, Game *copy_game){
+	int i,j;
+	copy_game->num_of_columns_in_block=game->num_of_columns_in_block;
+	copy_game->num_of_rows_in_block=game->num_of_rows_in_block;
+	copy_game->board_size=game->board_size;
+	intilizeEmptyBoard(copy_game);
+	for(i=1;i<=game->board_size;i++){
+		for(j=1;j<=game->board_size;j++){
+			copy_game->board[i][j].value= game->board[i][j].value;
+		}
+	}
+}
+void autoFillBoard(Game *game){
+	int i=1, j=1, value,start=1;
+	int *arr_of_options;
+	Game *copy_game=(Game*)malloc(sizeof(Game));
+	if(copy_game==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
+	copyGame(game,copy_game);
+	for(i=1;i<=game->board_size;i++){
+		for(j=1;j<=game->board_size;j++){
+			if(copy_game->board[i][j].value==0){
+				arr_of_options=(int*) calloc(game->board_size+1, sizeof(int));
+				if(arr_of_options==NULL){
+					printf("ERROR: problem with memory allocation\n");
+					exit(0);
+				}
+				fillArrWithOption(arr_of_options,copy_game,i,j);
+				if(stillHasOptionForCell(arr_of_options,copy_game)){
+					value= oneValidOption(arr_of_options,copy_game);
+					if(value!=0){
+						setCell(j,i,value,game,start);
+						start=0;
+					}
+				}
+				free(arr_of_options);
+			}
+		}
+	}
+	freeGame(copy_game);
+}
