@@ -134,20 +134,18 @@ void saveToFile(Game *game, char* fileDir){
 				printf("ERROR: invalid file name or file doesn't exist\n");
 				return;
 	}
-	if(game_status == Edit){ /*should check if game has a solution and board is valid!*/
-		fixCellsWithValues(game);
-	}
+
 	sprintf(converted, "%d", game->num_of_columns_in_block);
-	fprintf(fptr, converted);
+	fprintf(fptr, "%s", converted);
 	fprintf(fptr, " ");
 	sprintf(converted, "%d", game->num_of_rows_in_block);
-	fprintf(fptr, converted);
+	fprintf(fptr,"%s", converted);
 	fprintf(fptr, "\n");
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 				cur = (game->board)[i][j];
 				sprintf(converted, "%d", cur.value);
-				fprintf(fptr, converted);
+				fprintf(fptr, "%s", converted);
 				if(cur.fixed){
 					fprintf(fptr, ".");
 				}
