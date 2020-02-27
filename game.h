@@ -19,4 +19,5 @@ void redoMove(Game *game);
 void resetBoard(Game *game);
 void markInvalidCells(Game *game);
 void autoFillBoard(Game *game);
+void freeGame(Game *game);
 #endif /* GAME_H_ */

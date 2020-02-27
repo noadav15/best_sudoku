@@ -318,6 +318,7 @@ void freeGame(Game *game){
 		free(game->board[i]);
 	}
 	free(game->board);
+	clearList(game->move_history);
 	free(game);
 }
 
