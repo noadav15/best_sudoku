@@ -25,11 +25,11 @@ int checkFormatFixed(char* token){
 
 int checkMN(char *token){
 	if(token == NULL){
-				printf("ERROR: invalid format\n");
+				printf("ERROR: invalid format2\n");
 				return 0;
 		}
 		if(!checkFormatNotFixed(token)){
-				printf("ERROR: invalid format\n");
+				printf("ERROR: invalid format3\n");
 				return 0;
 		}
 	return 1;
@@ -44,12 +44,11 @@ Game* readFromFile(char* fileDir, int check_errors){
 	FILE *fptr;
 	int x = 1;
 	int y = 1;
-	Game *game = (Game*)malloc(sizeof(Game));
+	Game *game;
 	char delim[] = " \t\r\n\v\f";
 	fptr = fopen(fileDir, "r");
 	if(fptr == NULL){
 		printf("ERROR: invalid file name or file doesn't exist\n");
-		free(game);
 		return NULL;
 	}
 	fseek(fptr, 0, SEEK_END);
@@ -73,11 +72,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	}
 	num_of_rows_in_block = token[0] -'0';
 	board_size = num_of_columns_in_block * num_of_rows_in_block;
-	game->board_size = board_size;
-	game->num_of_columns_in_block = num_of_columns_in_block;
-	game->num_of_rows_in_block = num_of_rows_in_block;
-	game->move_history = createList();
-	intilizeEmptyBoard(game);
+	game = initializeGame(num_of_rows_in_block, num_of_columns_in_block);
 	token = strtok(NULL, delim);
 	while( token != NULL ) {
 	      if(checkFormatNotFixed(token)){
@@ -89,10 +84,12 @@ Game* readFromFile(char* fileDir, int check_errors){
 	    	  (game->board)[y][x].fixed = 1;
 	      }
 	      else{
+	    	  printf("1/n");
 	    	  goto free;
 	      }
 	      token = strtok(NULL, delim);
 	      	    if(token == NULL && (x != board_size || y != board_size)){
+	      	    	printf("2/n");
 	      	    	  goto free;
 	      }
 	      if(x == board_size){
@@ -114,7 +111,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 
 	if(x != board_size || y != board_size || token != NULL){
 		free:
-		printf("ERROR: invalid format\n");
+		printf("ERROR: invalid format1\n");
 		freeGame(game);
 		free(buffer);
 		fclose(fptr);
@@ -134,7 +131,9 @@ void saveToFile(Game *game, char* fileDir){
 				printf("ERROR: invalid file name or file doesn't exist\n");
 				return;
 	}
-
+	if(game_status == Edit){
+		fixCellsWithValues(game);
+	}
 	sprintf(converted, "%d", game->num_of_columns_in_block);
 	fprintf(fptr, "%s", converted);
 	fprintf(fptr, " ");

@@ -63,7 +63,7 @@ void clearList(MoveList *list){
 	skip: free(list);
 }
 
-void clearListUndone(MoveList *list){
+/*void clearListUndone(MoveList *list){
 	Move *temp = list->cur_move;
 	Move *ref = list->cur_move;
 	while(temp->next != NULL){
@@ -99,8 +99,29 @@ void insertToList(MoveList *list, int row, int column, int invalid, int before_v
 	if(move->move_start){
 		list->cur_move = move;
 	}
-}
+}*/
 
+void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
+	Move *temp;
+	Move *del;
+	Move *del_temp;
+	Move *move = createMove(row, column, invalid, before_value, after_value, fixed, move_start);
+	temp = list->cur_move;
+	while(temp->next != NULL && !temp->next->move_start){
+		temp = temp->next;
+	}
+	del = temp->next;
+	while(del != NULL){
+		del_temp = del->next;
+		free(del);
+		del = del_temp;
+	}
+	temp->next = move;
+	move->prev = temp;
+	if(move->move_start){
+		list->cur_move = move;
+	}
+}
 Move* undo(MoveList *list){
 	Move* ret = list->cur_move;
 	if(ret->edge){

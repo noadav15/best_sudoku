@@ -25,6 +25,7 @@ int checkFixedCells(Game *game);
 void fixCellsWithValues(Game *game);
 Game* solve(char* fileName);
 Game* edit(char* fileName);
+void exitGame(Game *game);
 Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block);
 int invalidCell(Game *game, int row , int column, int ignore_not_fixed);
 #endif /* GAME_H_ */

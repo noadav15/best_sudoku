@@ -247,7 +247,6 @@ void setCell(int x, int y, int z, Game *game, int start){
 	cur_cell = (game->board)[y][x];
 	insertToList(game->move_history, y, x, cur_cell.invalid, cur_cell.value, z, cur_cell.fixed, start);
 	(game->board)[y][x].value = z;
-	boardValueAreValid(game);
 
 }
 
@@ -314,11 +313,14 @@ void fixCellsWithValues(Game *game){
 
 void freeGame(Game *game){
 	int i;
+	if(game == NULL){
+		return;
+	}
 	for(i=1;i<=game->board_size;i++){
 		free(game->board[i]);
 	}
 	free(game->board);
-	/*clearList(game->move_history);*/
+	clearList(game->move_history);
 	free(game);
 
 }
@@ -477,7 +479,6 @@ Game* solve(char* fileName){
 	game = readFromFile(fileName, 1);
 	if(game != NULL){
 		markInvalidCells(game);
-		game_status = Edit;
 	}
 	return game;
 }
@@ -489,6 +490,12 @@ void markErrors(int mark){
 	else{
 		mark_errors = 1;
 	}
+}
+
+void exitGame(Game *game){
+	freeGame(game);
+	printf("exiting...");
+	exit(0);
 }
 
 
