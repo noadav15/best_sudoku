@@ -10,6 +10,7 @@
 #include <string.h>
 #include "structs.h"
 #include "linkedList.h"
+#include "fileParsing.h"
 #include "solve.h"
 
 
@@ -94,7 +95,7 @@ void intilizeEmptyBoard(Game *game){
 
 }
 
-Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block, int mark_errors, enum status cur_status){
+Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block){
 	Game *game = (Game*)malloc(sizeof(Game));
 	if(game==NULL){
 		printf("ERROR: problem with memory allocation\n");
@@ -104,7 +105,6 @@ Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block, int 
 	game->num_of_rows_in_block = num_of_columns_in_block;
 	game->board_size = num_of_rows_in_block * num_of_columns_in_block;
 	game->mark_errors = mark_errors;
-	game->cur_status = cur_status;
 	game->move_history = createList();
 	intilizeEmptyBoard(game);
 	return game;
@@ -226,7 +226,7 @@ int boardValueAreValid(Game *game){
 void setCell(int x, int y, int z, Game *game, int start){
 	Cell cur_cell;
 	int max_value = game->num_of_columns_in_block*game->num_of_rows_in_block;
-	if(game->cur_status == Init){
+	if(game_status == Init){
 		printf("Error: Set isn't available in Init mode\n");
 		return;
 	}
@@ -240,7 +240,7 @@ void setCell(int x, int y, int z, Game *game, int start){
 	if(z > max_value || z < 0){
 		printf("Error: value is invalid, must be between %d and %d\n", 0, max_value);
 	}
-	if((game->board)[y][x].fixed && game->cur_status == Solve){
+	if((game->board)[y][x].fixed && game_status == Solve){
 		printf("Error: cell is fixed, can't change fixed cells in Solve mode\n");
 		return;
 	}
@@ -443,3 +443,52 @@ void autoFillBoard(Game *game){
 	}
 	freeGame(copy_game);
 }
+
+int checkFixedCells(Game *game){
+	int i, j;
+	for(i=1;i<=game->board_size;i++){
+		for(j=1;j<=game->board_size;j++){
+			if((game->board)[i][j].fixed == 1){
+				if(invalidCell(game, i , j, 1)){
+					return 0;
+				}
+			}
+		}
+	}
+	return 1;
+}
+
+Game* edit(char* fileName){
+	Game *game;
+	if(strcmp(fileName, "") == 0){
+		game_status = Edit;
+		return initializeGame(9, 9);
+	}
+	game = readFromFile(fileName, 0);
+	if(game != NULL){
+		markInvalidCells(game);
+		game_status = Edit;
+	}
+	return game;
+}
+
+Game* solve(char* fileName){
+	Game *game;
+	game = readFromFile(fileName, 1);
+	if(game != NULL){
+		markInvalidCells(game);
+		game_status = Edit;
+	}
+	return game;
+}
+
+void markErrors(int mark){
+	if(mark == 0){
+		mark_errors = 0;
+	}
+	else{
+		mark_errors = 1;
+	}
+}
+
+

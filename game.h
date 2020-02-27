@@ -21,4 +21,7 @@ void resetBoard(Game *game);
 void markInvalidCells(Game *game);
 void autoFillBoard(Game *game);
 void freeGame(Game *game);
+int checkFixedCells(Game *game);
+void fixCellsWithValues(Game *game);
+Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block);
 #endif /* GAME_H_ */

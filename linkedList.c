@@ -1,23 +1,29 @@
-/*
- * linkedList.c
- *
- *  Created on: 25 ????? 2020
- *      Author: Tal
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "linkedList.h"
 
+int count_aloc;
+int count_free;
 Move* createEdge(){
 	Move *move = (Move*)malloc(sizeof(Move));
+	if(move == NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	move->edge = 1;
 	move->next = NULL;
 	move->prev = NULL;
+
 	return move;
 }
 MoveList* createList(){
 	MoveList *list = NULL;
 	list = (MoveList*)malloc(sizeof(MoveList));
+	if(list == NULL){
+			printf("ERROR: problem with memory allocation\n");
+			exit(0);
+	}
 	list->cur_move = createEdge();
 	return list;
 }
@@ -38,19 +44,19 @@ Move* createMove(int row, int column, int invalid, int before_value, int after_v
 }
 void clearList(MoveList *list){
 	Move *temp = list->cur_move;
+	Move *prev;
 	if(temp == NULL){
-		list->cur_move = NULL;
-		return;
+		goto skip;
 	}
 	while(temp->prev != NULL){
 		temp = temp->prev;
 	}
-	while(temp->next != NULL){
+	while(temp != NULL){
+		prev = temp;
 		temp = temp->next;
-		free(temp->prev);
+		free(prev);
 	}
-	free(temp);
-	list->cur_move = createEdge();
+	skip: free(list);
 }
 
 void clearListUndone(MoveList *list){

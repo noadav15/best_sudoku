@@ -36,7 +36,7 @@ int checkMN(char *token){
 }
 
 
-Game* readFromFile(char* fileDir){
+Game* readFromFile(char* fileDir, int check_errors){
 	int num_of_columns_in_block, num_of_rows_in_block, board_size;
 	long file_size;
 	char *buffer;
@@ -108,6 +108,10 @@ Game* readFromFile(char* fileDir){
 
 	}
 	token = strtok(NULL, delim);
+	if(check_errors == 1 && checkFixedCells(game) == 0){
+		goto free;
+	}
+
 	if(x != board_size || y != board_size || token != NULL){
 		free:
 		printf("ERROR: invalid format\n");
@@ -129,6 +133,9 @@ void saveToFile(Game *game, char* fileDir){
 	if(fptr == NULL){
 				printf("ERROR: invalid file name or file doesn't exist\n");
 				return;
+	}
+	if(game_status == Edit){ /*should check if game has a solution and board is valid!*/
+		fixCellsWithValues(game);
 	}
 	sprintf(converted, "%d", game->num_of_columns_in_block);
 	fprintf(fptr, converted);
