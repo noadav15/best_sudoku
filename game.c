@@ -318,11 +318,12 @@ void freeGame(Game *game){
 		free(game->board[i]);
 	}
 	free(game->board);
-	clearList(game->move_history);
+	/*clearList(game->move_history);*/
 	free(game);
+
 }
 
-int invalidCell(Game *game, int row , int column){
+int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 	int i,j,start_i,start_j,value;
 	value=game->board[row][column].value;
 	if(value==0){
@@ -331,16 +332,22 @@ int invalidCell(Game *game, int row , int column){
 	else{
 		for(i=1;i<=game->board_size;i++){
 			if(i!=column){
-				if(game->board[row][i].value==value){
-					return 1;
+				if((ignore_not_fixed==1 && game->board[row][i].fixed==1)|| ignore_not_fixed==0){
+					if(game->board[row][i].value==value){
+						return 1;
+					}
 				}
+
 			}
 		}
 		for(i=1;i<=game->board_size;i++){
 			if(i!=row){
-				if(game->board[i][column].value==value){
-					return 1;
+				if((ignore_not_fixed==1 &&game->board[i][column].fixed==1)|| ignore_not_fixed==0){
+					if(game->board[i][column].value==value){
+						return 1;
+					}
 				}
+
 			}
 		}
 		if( row%game->num_of_rows_in_block!=0){
@@ -353,13 +360,16 @@ int invalidCell(Game *game, int row , int column){
 			start_j=column- row%game->num_of_columns_in_block +1;
 		}
 		else{
-			start_i=row-game->num_of_columns_in_block +1;
+			start_j=row-game->num_of_columns_in_block +1;
 		}
 		for(i=start_i; i<start_i+game->num_of_rows_in_block;i++){
 			for(j=start_j; j<start_j+game->num_of_columns_in_block;j++){
 				if(i!=row || j!=column){
-					if(game->board[i][j].value==value){
-						return 1;
+					if((ignore_not_fixed==1 &&game->board[i][j].fixed==1)|| ignore_not_fixed==0){
+						if(game->board[i][j].value==value){
+							return 1;
+						}
+
 					}
 				}
 			}
@@ -371,7 +381,7 @@ void markInvalidCells(Game *game){
 	int i, j;
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
-			game->board[i][j].invalid=invalidCell(game,i,j);
+			game->board[i][j].invalid=invalidCell(game,i,j,0);
 
 		}
 	}
@@ -428,6 +438,7 @@ void autoFillBoard(Game *game){
 				}
 				free(arr_of_options);
 			}
+
 		}
 	}
 	freeGame(copy_game);
