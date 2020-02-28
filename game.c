@@ -15,7 +15,7 @@
 
 
 /*print cell*/
-void printCell(Cell *c, Game *game){
+void printCell(Cell *c){
 	if(c->value!=0){
 		int value= c->value;
 		if(c->fixed==1){
@@ -51,7 +51,7 @@ void printBlockRow(int i, Game *game){
 			if(j%game->num_of_columns_in_block==1){
 				printf("|");
 			}
-			printCell(&(game->board[k][j]), game);
+			printCell(&(game->board[k][j]));
 		}
 		printf("|\n");
 	}
@@ -335,6 +335,7 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 			if(i!=column){
 				if((ignore_not_fixed==1 && game->board[row][i].fixed==1)|| ignore_not_fixed==0){
 					if(game->board[row][i].value==value){
+						printf("row");
 						return 1;
 					}
 				}
@@ -345,6 +346,7 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 			if(i!=row){
 				if((ignore_not_fixed==1 &&game->board[i][column].fixed==1)|| ignore_not_fixed==0){
 					if(game->board[i][column].value==value){
+						printf("column");
 						return 1;
 					}
 				}
@@ -357,7 +359,7 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 		else{
 			start_i=row-game->num_of_rows_in_block +1;
 		}
-		if( row%game->num_of_columns_in_block!=0){
+		if(column%game->num_of_columns_in_block!=0){
 			start_j=column- row%game->num_of_columns_in_block +1;
 		}
 		else{
@@ -368,6 +370,7 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 				if(i!=row || j!=column){
 					if((ignore_not_fixed==1 &&game->board[i][j].fixed==1)|| ignore_not_fixed==0){
 						if(game->board[i][j].value==value){
+							printf("block- i=%d, j=%d, row=%d, col=%d\n",i,j,row,column);
 							return 1;
 						}
 
