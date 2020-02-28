@@ -7,7 +7,20 @@
 #include "solve.h"
 #include "game.h"
 
+int checkIfStringIsInt(char *str){
+	int i;
+	int str_len = strlen(str);
+	for(i = 0; i < str_len; i++){
+		if(!isdigit(str[i])){
+			return 0;
+		}
+	}
+	return 1;
+}
 
+int converStringToInt(char *str){
+	return atoi(str);
+}
 void initInput(char input[1024]){
 	int i;
 	for(i = 0; i < 1024; i++){
@@ -28,7 +41,7 @@ void initCommand(char command[4][1024]){
 
 Game* processCommand(Game *game, char command[4][1024], int command_length){
 	Game *out_game;
-	int num_of_sol, fill_ret;
+	int num_of_sol, fill_ret, i, set_ret;
 	char *commandType = command[0];
 	/*printf("command length: %d\n", command_length);*/
 	if(!strcmp(commandType, "solve")){
@@ -54,13 +67,17 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 			out_game = edit(command[1]);
 		}
 	}
-	else if(!strcmp(commandType, "mark_errors") && game_status == Solve){
+	else if(!strcmp(commandType, "mark_errors")){
 		if(command_length > 2){
 			printf("ERROR: too many parameters for mark_errors\n");
 			return game;
 		}
 		if(command_length == 1){
 			printf("ERROR: please enter 1 or 0  after mark_errors\n");
+			return game;
+		}
+		if(game_status != Solve){
+			printf("ERROR: mark_errors command is only available in Solve mode\n");
 			return game;
 		}
 		if(strcmp(command[1], "1") && strcmp(command[1], "0")){
@@ -100,7 +117,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 					return game;
 				}
 				else{
-					if(game_status != Solve || game_status != Edit){
+					if(game_status != Solve && game_status != Edit){
 						printf("ERROR: print_board command is only available in Solve or Edit mode\n");
 						return game;
 					}
@@ -136,11 +153,78 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 					printf("ERROR: reset command doesn't have parameters\n");
 					return game;
 			}
-			if(game_status != Solve || game_status != Edit){
-					printf("ERROR: reset command is only available in Solve or Edit mode\n");
-					return game;
+			if(game_status != Solve && game_status != Edit){
+						printf("ERROR: reset command is only available in Solve or Edit mode\n");
+						return game;
 			}
 			resetBoard(game);
+			printBoard(game);
+			return game;
+	}
+	else if(!strcmp(commandType, "save")){
+			if(command_length == 1){
+				printf("ERROR: please enter a file name after save\n");
+				return game;
+			}
+			if(command_length > 2){
+				printf("ERROR: too many parameters for save\n");
+				return game;
+			}
+			save(game, command[1]);
+			return game;
+	}
+	else if(!strcmp(commandType, "undo")){
+				if(command_length > 1){
+						printf("ERROR: undo command doesn't have parameters\n");
+						return game;
+				}
+				if(game_status != Solve && game_status != Edit){
+							printf("ERROR: undo command is only available in Solve or Edit mode\n");
+							return game;
+				}
+				if(undoMove(game)){
+					printBoard(game);
+				}
+				return game;
+	}
+	else if(!strcmp(commandType, "redo")){
+					if(command_length > 1){
+							printf("ERROR: redo command doesn't have parameters\n");
+							return game;
+					}
+					if(game_status != Solve && game_status != Edit){
+								printf("ERROR: redo command is only available in Solve or Edit mode\n");
+								return game;
+					}
+					if(redoMove(game)){
+						printBoard(game);
+					}
+					return game;
+	}
+	else if(!strcmp(commandType, "set")){
+			if(command_length > 4){
+				printf("ERROR: too many parameters for set, please enter 3 parameters\n");
+				return game;
+			}
+			if(command_length == 1 || command_length == 2 || command_length == 3){
+				printf("ERROR: not enough parameters for set, please enter 3 parameters\n");
+				return game;
+			}
+			for(i = 1; i < 4; i++){
+				if(!checkIfStringIsInt(command[i])){
+					printf("ERROR: one of sets parameters isn't an integer\n");
+					return game;
+				}
+			}
+			set_ret = setCell(converStringToInt(command[1]), converStringToInt(command[2]), converStringToInt(command[3]), game, 1);
+			if(set_ret){
+				printBoard(game);
+			}
+			return game;
+	}
+	else{
+		printf("ERROR: invalid command\n");
+		return game;
 	}
 	if(out_game != NULL){
 		printBoard(out_game);
@@ -148,6 +232,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 	}
 	return game;
 }
+
 
 Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 	char* token;
@@ -159,10 +244,10 @@ Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 	if(feof(stdin)){
 		exitGame(game);
 	}
-	printf("enter command:\n");
+	printf("Please enter a command:\n");
 	fgets(input, 1024, stdin);
 	if(strlen(input) > 256){
-		printf("input is too long:\n");
+		printf("ERROR: input is too long:\n");
 		return 0;
 	}
 	token = strtok(input, delim);

@@ -12,12 +12,13 @@
 void intilizeEmptyBoard(Game *game);
 int autoFillBoard(Game *game);
 void printBoard(Game *game);
+void save(Game *game, char* save_dir);
 int boardValueAreValid(Game *game);
 void freeGame(Game *game);
 void intilizeEmptyCell(Cell *c);
-void setCell(int x, int y, int z, Game *game, int start);
-void undoMove(Game *game);
-void redoMove(Game *game);
+int setCell(int x, int y, int z, Game *game, int start);
+int undoMove(Game *game);
+int redoMove(Game *game);
 void resetBoard(Game *game);
 void markInvalidCells(Game *game);
 int checkFixedCells(Game *game);

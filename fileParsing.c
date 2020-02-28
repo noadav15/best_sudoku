@@ -5,18 +5,21 @@
 #include <ctype.h>
 #include "structs.h"
 #include "game.h"
+#include "parser.h"
 
 int checkFormatNotFixed(char* token){
-	if(strlen(token) == 1){
-		if(isdigit(token[0])){
-			return 1;
+	if(strlen(token) > 0){
+			if(checkIfStringIsInt(token)){
+				return 1;
 		}
 	}
 	return 0;
 }
 int checkFormatFixed(char* token){
-	if(strlen(token) == 2){
-				if(isdigit(token[0]) && token[1] == '.'){
+	char check[1024];
+	if(strlen(token) >= 2){
+				strncpy(check, token, strlen(token) - 1);
+				if(checkIfStringIsInt(check) && token[strlen(token) - 1] == '.'){
 						return 1;
 				}
 			}
@@ -25,11 +28,11 @@ int checkFormatFixed(char* token){
 
 int checkMN(char *token){
 	if(token == NULL){
-				printf("ERROR: invalid format2\n");
+				printf("ERROR: invalid format\n");
 				return 0;
 		}
 		if(!checkFormatNotFixed(token)){
-				printf("ERROR: invalid format3\n");
+				printf("ERROR: invalid format\n");
 				return 0;
 		}
 	return 1;
@@ -41,10 +44,12 @@ Game* readFromFile(char* fileDir, int check_errors){
 	long file_size;
 	char *buffer;
 	char *token;
+	char value[1024];
 	FILE *fptr;
 	int x = 1;
 	int y = 1;
 	Game *game;
+	int converted_value;
 	char delim[] = " \t\r\n\v\f";
 	fptr = fopen(fileDir, "r");
 	if(fptr == NULL){
@@ -65,31 +70,44 @@ Game* readFromFile(char* fileDir, int check_errors){
 	if(checkMN(token) == 0){
 		return NULL;
 	}
-	num_of_columns_in_block = token[0] - '0';
+	num_of_columns_in_block = converStringToInt(token);
 	token = strtok(NULL, delim);
 	if(checkMN(token) == 0){
 			return NULL;
 	}
-	num_of_rows_in_block = token[0] -'0';
+	num_of_rows_in_block = converStringToInt(token);
 	board_size = num_of_columns_in_block * num_of_rows_in_block;
 	game = initializeGame(num_of_rows_in_block, num_of_columns_in_block);
 	token = strtok(NULL, delim);
 	while( token != NULL ) {
 	      if(checkFormatNotFixed(token)){
-	    	  (game->board)[y][x].value = token[0] - '0';
-	    	  (game->board)[y][x].fixed = 0;
+	    	  converted_value = converStringToInt(token);
+	    	  if(converted_value >= 0 && converted_value <= board_size){
+				  (game->board)[y][x].value = converted_value;
+				  (game->board)[y][x].fixed = 0;
+	    	  }
+	    	  else{
+	    		  printf("ERROR: one or more cell value is out of range\n");
+	    		  goto free_without_print;
+	    	  }
 	      }
 	      else if(checkFormatFixed(token)){
-	    	  (game->board)[y][x].value = token[0] - '0';
-	    	  (game->board)[y][x].fixed = 1;
+	    	  strncpy(value, token, strlen(token) - 1);
+	    	  converted_value = converStringToInt(value);
+	    	  if(converted_value >= 0 && converted_value <= board_size){
+				  (game->board)[y][x].value = converted_value;
+				  (game->board)[y][x].fixed = 1;
+	    	  }
+	    	  else{
+	    		  printf("ERROR: one or more cell value is out of range\n");
+	    		  goto free_without_print;
+	    	  }
 	      }
 	      else{
-	    	  printf("1/n");
 	    	  goto free;
 	      }
 	      token = strtok(NULL, delim);
 	      	    if(token == NULL && (x != board_size || y != board_size)){
-	      	    	printf("2/n");
 	      	    	  goto free;
 	      }
 	      if(x == board_size){
@@ -112,6 +130,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	if(x != board_size || y != board_size || token != NULL){
 		free:
 		printf("ERROR: invalid format\n");
+		free_without_print:
 		freeGame(game);
 		free(buffer);
 		fclose(fptr);

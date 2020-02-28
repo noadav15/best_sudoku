@@ -222,31 +222,36 @@ int boardValueAreValid(Game *game){
  * if cell exists in one of it's neighbors prints: value is invalid and returns 0
  * otherwise, keeps the cell and returns 1
  * */
-void setCell(int x, int y, int z, Game *game, int start){
+int setCell(int x, int y, int z, Game *game, int start){
 	Cell cur_cell;
-	int max_value = game->num_of_columns_in_block*game->num_of_rows_in_block;
+	int max_value;
 	if(game_status == Init){
-		printf("Error: Set isn't available in Init mode\n");
-		return;
+			printf("Error: Set isn't available in Init mode\n");
+			return 0;
 	}
+	max_value = game->num_of_columns_in_block*game->num_of_rows_in_block;
 	if(y > game->board_size || y < 1){
 		printf("Error: column number is incorrect\n");
+		return 0;
 	}
 	if(x > game->board_size || x < 1){
 		printf("Error: row number is incorrect\n");
+		return 0;
 	}
 
 	if(z > max_value || z < 0){
 		printf("Error: value is invalid, must be between %d and %d\n", 0, max_value);
+		return 0;
 	}
 	if((game->board)[y][x].fixed && game_status == Solve){
 		printf("Error: cell is fixed, can't change fixed cells in Solve mode\n");
-		return;
+		return 0;
 	}
 	cur_cell = (game->board)[y][x];
-	insertToList(game->move_history, y, x, cur_cell.invalid, cur_cell.value, z, cur_cell.fixed, start);
 	(game->board)[y][x].value = z;
-
+	insertToList(game->move_history, y, x, cur_cell.invalid, cur_cell.value, z, cur_cell.fixed, start);
+	markInvalidCells(game);
+	return 1;
 }
 
 void setCellsByMove(Game *game, Move *move, int undo){
@@ -271,23 +276,24 @@ void setCellsByMove(Game *game, Move *move, int undo){
 	}
 }
 
-void undoMove(Game *game){
+int undoMove(Game *game){
 	Move *move = undo(game->move_history);
 	if(move == NULL){
 		printf("Error: no moves to undo\n");
-		return;
+		return 0;
 	}
 	setCellsByMove(game, move, 1);
-
+	return 1;
 }
 
-void redoMove(Game *game){
+int redoMove(Game *game){
 	Move *move = redo(game->move_history);
 	if(move == NULL){
 		printf("Error: no moves to redo\n");
-		return;
+		return 0;
 	}
 	setCellsByMove(game, move, 0);
+	return 1;
 }
 
 void resetBoard(Game *game){
@@ -439,8 +445,7 @@ int autoFillBoard(Game *game){
 				if(stillHasOptionForCell(arr_of_options,copy_game)){
 					value= oneValidOption(arr_of_options,copy_game);
 					if(value!=0){
-						printf("row=%d, column=%d, value=%d\n",i,j,value);
-						setCell(i,j,value,game,start);
+						setCell(j,i,value,game,start);
 						start=0;
 					}
 				}
@@ -499,6 +504,13 @@ void markErrors(int mark){
 	}
 }
 
+void save(Game *game, char* save_dir){
+	if(game_status != Solve && game_status != Edit){
+		printf("ERROR: The save command is only available in Solve or Edit mode\n");
+		return;
+	}
+	saveToFile(game, save_dir);
+}
 
 void exitGame(Game *game){
 	freeGame(game);
