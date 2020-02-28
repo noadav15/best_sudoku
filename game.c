@@ -415,10 +415,15 @@ void copyGame(Game *game, Game *copy_game){
 		}
 	}
 }
-void autoFillBoard(Game *game){
+int autoFillBoard(Game *game){
 	int i=1, j=1, value,start=1;
+	Game *copy_game;
 	int *arr_of_options;
-	Game *copy_game=(Game*)malloc(sizeof(Game));
+	if(!boardValueAreValid(game)){
+		printf("ERROR: board is invalid\n");
+		return 0;
+	}
+	copy_game = (Game*)malloc(sizeof(Game));
 	if(copy_game==NULL){
 		printf("ERROR: problem with memory allocation\n");
 		exit(0);
@@ -446,6 +451,7 @@ void autoFillBoard(Game *game){
 		}
 	}
 	freeGame(copy_game);
+	return 1;
 }
 
 int checkFixedCells(Game *game){

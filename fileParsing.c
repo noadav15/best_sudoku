@@ -111,11 +111,17 @@ Game* readFromFile(char* fileDir, int check_errors){
 
 	if(x != board_size || y != board_size || token != NULL){
 		free:
-		printf("ERROR: invalid format1\n");
+		printf("ERROR: invalid format\n");
 		freeGame(game);
 		free(buffer);
 		fclose(fptr);
 		return NULL;
+	}
+	if(check_errors == 1){
+		game_status = Solve;
+	}
+	else{
+		game_status = Edit;
 	}
 	free(buffer);
 	fclose(fptr);

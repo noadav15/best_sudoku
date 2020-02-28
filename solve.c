@@ -183,6 +183,10 @@ int backTracking(int i, int j, Game *game){
  */
 int countSolutions(Game *game){
 	int i=1,j=1, start_index_row, start_index_column, check=0;
+	if(!boardValueAreValid(game)){
+		printf("ERROR: board is invalid\n");
+		return 0;
+	}
 	for(i=1;i<=game->board_size && check ==0;i++){
 		for(j=1;j<=game->board_size && check ==0;j++){
 			if(game->board[i][j].value==0){
