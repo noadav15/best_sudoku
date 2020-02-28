@@ -335,7 +335,6 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 			if(i!=column){
 				if((ignore_not_fixed==1 && game->board[row][i].fixed==1)|| ignore_not_fixed==0){
 					if(game->board[row][i].value==value){
-						printf("row");
 						return 1;
 					}
 				}
@@ -346,7 +345,6 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 			if(i!=row){
 				if((ignore_not_fixed==1 &&game->board[i][column].fixed==1)|| ignore_not_fixed==0){
 					if(game->board[i][column].value==value){
-						printf("column");
 						return 1;
 					}
 				}
@@ -360,17 +358,16 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 			start_i=row-game->num_of_rows_in_block +1;
 		}
 		if(column%game->num_of_columns_in_block!=0){
-			start_j=column- row%game->num_of_columns_in_block +1;
+			start_j=column- column%game->num_of_columns_in_block +1;
 		}
 		else{
-			start_j=row-game->num_of_columns_in_block +1;
+			start_j=column-game->num_of_columns_in_block +1;
 		}
 		for(i=start_i; i<start_i+game->num_of_rows_in_block;i++){
 			for(j=start_j; j<start_j+game->num_of_columns_in_block;j++){
 				if(i!=row || j!=column){
 					if((ignore_not_fixed==1 &&game->board[i][j].fixed==1)|| ignore_not_fixed==0){
 						if(game->board[i][j].value==value){
-							printf("block- i=%d, j=%d, row=%d, col=%d\n",i,j,row,column);
 							return 1;
 						}
 
@@ -405,6 +402,7 @@ int oneValidOption(int *arr,Game *game){
 }
 void copyGame(Game *game, Game *copy_game){
 	int i,j;
+	copy_game->move_history = createList();
 	copy_game->num_of_columns_in_block=game->num_of_columns_in_block;
 	copy_game->num_of_rows_in_block=game->num_of_rows_in_block;
 	copy_game->board_size=game->board_size;
@@ -441,7 +439,8 @@ int autoFillBoard(Game *game){
 				if(stillHasOptionForCell(arr_of_options,copy_game)){
 					value= oneValidOption(arr_of_options,copy_game);
 					if(value!=0){
-						setCell(j,i,value,game,start);
+						printf("row=%d, column=%d, value=%d\n",i,j,value);
+						setCell(i,j,value,game,start);
 						start=0;
 					}
 				}
