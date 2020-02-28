@@ -22,7 +22,7 @@ void printCell(Cell *c, Game *game){
 			printf(" %2d.",value);
 		}
 		else{
-			if(c->invalid==1 && game->mark_errors==1 ){
+			if(c->invalid==1 && mark_errors==1 ){
 				printf(" %2d*",value);
 			}
 			else{
@@ -104,7 +104,6 @@ Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block){
 	game->num_of_columns_in_block = num_of_rows_in_block;
 	game->num_of_rows_in_block = num_of_columns_in_block;
 	game->board_size = num_of_rows_in_block * num_of_columns_in_block;
-	game->mark_errors = mark_errors;
 	game->move_history = createList();
 	intilizeEmptyBoard(game);
 	return game;

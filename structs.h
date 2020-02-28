@@ -19,7 +19,6 @@ typedef struct{
 	int num_of_rows_in_block;
 	int num_of_columns_in_block;
 	int board_size;
-	int mark_errors;
 	MoveList *move_history;
 	Cell **board;
 	} Game;
