@@ -463,7 +463,7 @@ Game* edit(char* fileName){
 	Game *game;
 	if(strcmp(fileName, "") == 0){
 		game_status = Edit;
-		return initializeGame(9, 9);
+		return initializeGame(3, 3);
 	}
 	game = readFromFile(fileName, 0);
 	if(game != NULL){
@@ -490,6 +490,7 @@ void markErrors(int mark){
 		mark_errors = 1;
 	}
 }
+
 
 void exitGame(Game *game){
 	freeGame(game);
