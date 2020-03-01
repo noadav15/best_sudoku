@@ -307,7 +307,7 @@ int setBlockConstraints(Game *game){
 	/*for each block*/
 	for(i=1;i<=game->board_size;i=i+game->num_of_columns_in_block){
 		for(j=1;j<=game->board_size;j=j+game->num_of_rows_in_block){
-			/*for each value in eacj block*/
+			/*for each value in each block*/
 			for(value=1;value<=game->board_size;value++){
 				current_k=0;
 				for(row=j;row<j+game->num_of_rows_in_block;row++){

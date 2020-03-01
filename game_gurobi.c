@@ -94,26 +94,31 @@ void hint(Game *game, int row,int column){
 	freeGR();
 }
 
-void guess(Game *game, float X){
+int guess(Game *game, float X){
 	int value=0,valid;
 
 	valid= autoFillBoard(game);
 	if(valid==0){
-		return;
+		printf("there are errors on the board, no solution, no hint\n");
+		return 0;
 	}
 	value = callGurobi(game,0);
 	if(value==1){
 		fillAllGuesses(game,X);
-		printf("final\n");
-		printBoard(game);
+		freeGR();
+		return 1;
 	}
 	if(value==0){
 		printf("no solution found- board is not solvable\n");
+		freeGR();
+		return 0;
 	}
 	if(value==-1){
 		printf("problem accrued in gurobi\n");
+		freeGR();
+		return 0;
 	}
-	freeGR();
+	return 0;
 }
 
 
