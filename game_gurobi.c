@@ -75,7 +75,7 @@ void hint(Game *game, int row,int column){
 		printf("there are errors on the board, no solution, no hint\n");
 		return;
 	}
-	if(game->board[row][column].fixed==1||game->board[row][column].fixed!=0){
+	if(game->board[row][column].fixed==1||game->board[row][column].value!=0){
 		printf("cell not empty can't get an hint\n");
 		return;
 	}
@@ -127,13 +127,14 @@ void guessHint(Game *game, int row, int column){
 		printf("there are errors on the board, no solution, no hint\n");
 		return;
 	}
-	if(game->board[row][column].fixed==1||game->board[row][column].fixed!=0){
+	if(game->board[row][column].fixed==1||game->board[row][column].value!=0){
 		printf("cell not empty can't get an hint\n");
 		return;
 	}
 	value = callGurobi(game,0);
 	if(value==1){
-
+		printf("im here\n");
+		printGuessHint(game, row,column);
 		freeGR();
 	}
 	if(value==0){

@@ -17,7 +17,7 @@ void printCell(Cell *c){
 			printf(" %2d.",value);
 		}
 		else{
-			if(c->invalid==1 && mark_errors==1 ){
+			if((c->invalid==1) && (mark_errors==1 || game_status==Edit) ){
 				printf(" %2d*",value);
 			}
 			else{
@@ -439,7 +439,7 @@ void copyGame(Game *game, Game *copy_game){
 /*autofills all cells which have only one possible value.
  * returns 1 if autofill was successful and 0 otherwise */
 int autoFillBoard(Game *game){
-	int i=1, j=1, value,start=1;
+	int i=1, j=1, value,start=1,changes=0;
 	Game *copy_game;
 	int *arr_of_options;
 	if(!boardValueAreValid(game)){
@@ -466,6 +466,7 @@ int autoFillBoard(Game *game){
 					if(value!=0){
 						setCell(j,i,value,game,start);
 						start=0;
+						changes++;
 					}
 				}
 				free(arr_of_options);
@@ -474,6 +475,9 @@ int autoFillBoard(Game *game){
 		}
 	}
 	freeGame(copy_game);
+	if(changes==0){
+		printf("autofill didn't find any cells to fill\n");
+	}
 	return 1;
 }
 

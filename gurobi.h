@@ -26,5 +26,6 @@ int creatRangeConstrainInLp();
 void fillAllGuesses(Game *game,float X);
 int createBounds();
 int sendToModel();
+void printGuessHint(Game *game, int row, int column);
 
 #endif /* GUROBI_H_ */

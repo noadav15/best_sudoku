@@ -593,9 +593,26 @@ void fillAllGuesses(Game *game,float X){
 			}
 		}
 	}
-	printf("game-guess\n");
-	printBoard(game);
 	freeGame(game_sol);
+}
+void printGuessHint(Game *game, int row, int column){
+	int value,place,count;
+	/*for(i=0;i<number_of_varibals;i++){
+		printf("row=%d, column=%d, value=%d, index=%d, sol=%f\n", obj_value[i].row,obj_value[i].column,obj_value[i].value,i,sol[i]);
+	}*/
+	printf("guess hint cell<%d,%d>:\n",column,row);
+	for(value=1;value<=game->board_size;value++){
+		place=findPlaceForOption(row,column,value);
+		if(place!=-1 && sol[place]>0){
+			printf("value-%d has %f percent chance to fit cell\n",value,sol[place]);
+			count++;
+		}
+	}
+	if(count==0){
+		printf("there are no guesses with positive chance\n");
+	}
+
+
 }
 /* IMPORTANT !!! - Free model and environment */
 void freeGR(){
