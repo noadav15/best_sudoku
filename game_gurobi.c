@@ -53,7 +53,7 @@ void validate(Game *game){
 	int value=0,valid;
 	valid=boardValueAreValid(game);
 	if(valid==0){
-		printf("there are errors on the board, no solution\n");
+		printf("there is erroneous\n");
 		return;
 	}
 	value=callGurobi(game,1);
@@ -64,7 +64,7 @@ void validate(Game *game){
 		printf("no solution found- board is not solvable\n");
 	}
 	if(value==-1){
-		printf("problem accrued in gurobi\n");
+		printf("ERROR: a problem has accrued with Gurobi\n");
 	}
 	freeGR();
 }
@@ -72,21 +72,21 @@ void hint(Game *game, int row,int column){
 	int value=0,valid;
 	valid=boardValueAreValid(game);
 	if(valid==0){
-		printf("there are errors on the board, no solution, no hint\n");
+		printf("the board is erroneous\n");
 		return;
 	}
 	if(game->board[row][column].fixed==1||game->board[row][column].value!=0){
-		printf("cell not empty can't get an hint\n");
+		printf("this cell already contains a value\n");
 		return;
 	}
 	value=callGurobi(game,1);
 
 	if(value==1){
 		int value = getHint(row,column,game);
-		printf("Hint- int cell<%d,%d> put %d.\n",column,row,value);
+		printf("Hint- set cell<%d,%d> to %d.\n",column,row,value);
 	}
 	if(value==0){
-		printf("no solution found- board is not solvable\n");
+		printf("no solution found- board is unsolvable\n");
 	}
 	if(value==-1){
 		printf("problem accrued in gurobi\n");
@@ -99,7 +99,7 @@ int guess(Game *game, float X){
 
 	valid= autoFillBoard(game);
 	if(valid==0){
-		printf("there are errors on the board, no solution, no hint\n");
+		printf("the board is erroneous\n");
 		return 0;
 	}
 	value = callGurobi(game,0);
@@ -109,7 +109,7 @@ int guess(Game *game, float X){
 		return 1;
 	}
 	if(value==0){
-		printf("no solution found- board is not solvable\n");
+		printf("no solution found- board is unsolvable\n");
 		freeGR();
 		return 0;
 	}
@@ -124,11 +124,11 @@ void guessHint(Game *game, int row, int column){
 	int value=0,valid;
 	valid=boardValueAreValid(game);
 	if(valid==0){
-		printf("there are errors on the board, no solution, no hint\n");
+		printf("the board is erroneous\n");
 		return;
 	}
 	if(game->board[row][column].fixed==1||game->board[row][column].value!=0){
-		printf("cell not empty can't get an hint\n");
+		printf("this cell already contains a value\n");
 		return;
 	}
 	value = callGurobi(game,0);
@@ -137,7 +137,7 @@ void guessHint(Game *game, int row, int column){
 		freeGR();
 	}
 	if(value==0){
-		printf("no solution found- board is not solvable\n");
+		printf("no solution found- board is unsolvable\n");
 		freeGR();
 	}
 	if(value==-1){

@@ -14,7 +14,8 @@ typedef struct _Move{
 	int invalid;
 	int before_value;
 	int after_value;
-	int fixed;
+	int fixed_before;
+	int fixed_after;
 	struct _Move *next;
 	struct _Move *prev;
 	int move_start;
@@ -33,7 +34,7 @@ MoveList* createList();
 void clearList(MoveList *list);
 
 /*adds a new move to the list*/
-void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start);
+void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed_before, int fixed_after, int move_start);
 
 /*returns a pointer to the move that needs to be undone and moves the list pointer accordingly*/
 Move* undo(MoveList *list);

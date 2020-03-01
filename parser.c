@@ -329,7 +329,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 								return game;
 							}
 						}
-						/*call guess_hint here!*/
+						guessHint(game, converStringToInt(command[2]), converStringToInt(command[1]));
 						return game;
 				}
 	else if(!strcmp(commandType, "guess")){

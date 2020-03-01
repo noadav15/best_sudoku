@@ -132,7 +132,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	token = strtok(NULL, delim);
 	if(check_errors == 1 && checkFixedCells(game) == 0){
 		printf("ERROR: trying to load a board with an erroneous fixed cell\n");
-		goto free;
+		goto free_without_print;
 	}
 	if(x != board_size || y != board_size || token != NULL){
 		free:

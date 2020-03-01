@@ -601,12 +601,12 @@ void printGuessHint(Game *game, int row, int column){
 	for(value=1;value<=game->board_size;value++){
 		place=findPlaceForOption(row,column,value);
 		if(place!=-1 && sol[place]>0){
-			printf("value-%d has %f percent chance to fit cell\n",value,sol[place]);
+			printf("value-%d has %f percent chance to fit in this cell\n",value,sol[place]);
 			count++;
 		}
 	}
 	if(count==0){
-		printf("there are no guesses with positive chance\n");
+		printf("there are no guesses with a positive chance\n");
 	}
 
 

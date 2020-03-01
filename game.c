@@ -230,16 +230,16 @@ int setCell(int x, int y, int z, Game *game, int start){
 	}
 	max_value = game->num_of_columns_in_block*game->num_of_rows_in_block;
 	if(y > game->board_size || y < 1){
-		printf("Error: column number is incorrect\n");
+		printf("Error: column number is incorrect - out of range\n");
 		return 0;
 	}
 	if(x > game->board_size || x < 1){
-		printf("Error: row number is incorrect\n");
+		printf("Error: row number is incorrect - out of range\n");
 		return 0;
 	}
 
 	if(z > max_value || z < 0){
-		printf("Error: value is invalid, must be between %d and %d\n", 0, max_value);
+		printf("Error: the 3rd parameter (value) is invalid, must be between %d and %d\n", 0, max_value);
 		return 0;
 	}
 	if((game->board)[y][x].fixed && game_status == Solve){
@@ -248,7 +248,10 @@ int setCell(int x, int y, int z, Game *game, int start){
 	}
 	cur_cell = (game->board)[y][x];
 	(game->board)[y][x].value = z;
-	insertToList(game->move_history, y, x, cur_cell.invalid, cur_cell.value, z, cur_cell.fixed, start);
+	insertToList(game->move_history, y, x, cur_cell.invalid, cur_cell.value, z, cur_cell.fixed, 0, start);
+	if((game->board)[y][x].fixed){
+			(game->board)[y][x].fixed = 0;
+	}
 	markInvalidCells(game);
 	return 1;
 }
@@ -265,13 +268,13 @@ void setCellsByMove(Game *game, Move *move, int undo){
 		if(undo){
 			printf("undo: changed cell [%d][%d] back from %d to %d\n", x, y, move->after_value, move->before_value);
 			(game->board)[y][x].value = move->before_value;
+			(game->board)[y][x].fixed = move->fixed_before;
 		}
 		else{
 			printf("redo: changed cell [%d][%d] from %d to %d\n", x, y, move->before_value, move->after_value);
 			(game->board)[y][x].value = move->after_value;
+			(game->board)[y][x].fixed = move->fixed_after;
 		}
-		(game->board)[y][x].fixed = move->fixed;
-		(game->board)[y][x].invalid = move->invalid;
 		if(move->move_start){
 			break;
 		}
@@ -445,7 +448,7 @@ int autoFillBoard(Game *game){
 	Game *copy_game;
 	int *arr_of_options;
 	if(!boardValueAreValid(game)){
-		printf("ERROR: board is invalid\n");
+		printf("ERROR: the board is erroneous\n");
 		return 0;
 	}
 	copy_game = (Game*)malloc(sizeof(Game));

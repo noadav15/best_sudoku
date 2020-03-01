@@ -33,7 +33,7 @@ MoveList* createList(){
 }
 
 /*receives move information, creates a move node and returns it*/
-Move* createMove(int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
+Move* createMove(int row, int column, int invalid, int before_value, int after_value, int fixed_before, int fixed_after, int move_start){
 	Move *move = (Move*)malloc(sizeof(Move));
 	if(move == NULL){
 		printf("ERROR: problem with memory allocation\n");
@@ -41,7 +41,8 @@ Move* createMove(int row, int column, int invalid, int before_value, int after_v
 	}
 	move->column = column;
 	move->row = row;
-	move->fixed = fixed;
+	move->fixed_before = fixed_before;
+	move->fixed_after = fixed_after;
 	move->move_start = move_start;
 	move->invalid = invalid;
 	move->before_value = before_value;
@@ -71,11 +72,11 @@ void clearList(MoveList *list){
 }
 
 /*adds a new move to the list*/
-void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
+void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed_before, int fixed_after, int move_start){
 	Move *temp;
 	Move *del;
 	Move *del_temp;
-	Move *move = createMove(row, column, invalid, before_value, after_value, fixed, move_start);
+	Move *move = createMove(row, column, invalid, before_value, after_value, fixed_before, fixed_after, move_start);
 	temp = list->cur_move;
 	while(temp->next != NULL && !temp->next->move_start){
 		temp = temp->next;
