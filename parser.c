@@ -285,7 +285,9 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 						return game;
 					}
 				}
-				/*call generate here!*/
+				if(generate(game, converStringToInt(command[1]), converStringToInt(command[0]))){
+					printBoard(game);
+				}
 				return game;
 		}
 	else if(!strcmp(commandType, "hint")){
