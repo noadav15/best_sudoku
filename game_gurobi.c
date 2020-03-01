@@ -1,3 +1,4 @@
+/*this module includes all game functions that use gurobi*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +8,7 @@
 #include "gurobi_c.h"
 #include "gurobi.h"
 
+/*calls gurobi ILP/LP*/
 int callGurobi(Game *game, int ILP){
 	int value;
 	if(!createEnv()){
@@ -49,6 +51,8 @@ int callGurobi(Game *game, int ILP){
 	value=end();
 	return value;
 }
+
+/*checks whether the board is solvable using gurobi ILP*/
 void validate(Game *game){
 	int value=0,valid;
 	valid=boardValueAreValid(game);
@@ -68,6 +72,8 @@ void validate(Game *game){
 	}
 	freeGR();
 }
+
+/*receives cell index and finds a hint for it if exists*/
 void hint(Game *game, int row,int column){
 	int value=0,valid;
 	valid=boardValueAreValid(game);
@@ -94,6 +100,7 @@ void hint(Game *game, int row,int column){
 	freeGR();
 }
 
+/*receives a threshold value and fills the game board with guesses with higher probebility than the threshold*/
 int guess(Game *game, float X){
 	int value=0,valid;
 
@@ -120,6 +127,8 @@ int guess(Game *game, float X){
 	}
 	return 0;
 }
+
+/*receives a cell index and finds all possible valid values for it with probability higher than 0 for a solution*/
 void guessHint(Game *game, int row, int column){
 	int value=0,valid;
 	valid=boardValueAreValid(game);
@@ -146,6 +155,8 @@ void guessHint(Game *game, int row, int column){
 
 	}
 }
+
+/*returns a random empty cell index*/
 int *randomCell(Game *copy_game){
 	int row, column;
 	int *result=(int*)malloc(2*sizeof(int));
@@ -159,6 +170,8 @@ int *randomCell(Game *copy_game){
 	result[1]=column;
 	return result;
 }
+
+/*deletes Y random values from the game board*/
 void emptyYCells(Game *copy_game, int Y){
 	int row, column,i;
 	for(i=1;i<=Y;i++){
@@ -173,6 +186,8 @@ void emptyYCells(Game *copy_game, int Y){
 		copy_game->board[row][column].invalid=0;
 	}
 }
+
+/*fills X random cells with random valid values*/
 int fillXCells(Game *copy_game, int X){
 	int value=0,count,*indexes,random_index,count_X;
 	int *arr_of_option;
@@ -209,6 +224,8 @@ int fillXCells(Game *copy_game, int X){
 	return 1;
 }
 
+/*Generates a puzzle by randomly filling X empty cells with legal values,
+running ILP to solve the board, and then clearing all but Y random cells.*/
 int generate(Game *game, int X,int Y){
 	int value=0,valid,count,i,j,k, first=1;
 	Game *copy_game ;

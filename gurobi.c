@@ -39,6 +39,8 @@ int createEnv(){
 	}
 	return 1;
 }
+
+/*gurobi wont print messages*/
 int noMessages(){
 	error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
 	if (error) {
@@ -79,6 +81,8 @@ void fillObjValue(Game *game){
 		}
 	}
 }
+
+/*fills the object array*/
 int createObjAndSendToModel(Game *game, int ILP){
 	int count=0,i,j,value,invalid=0;
 	for(i=1;i<=game->board_size;i++){
@@ -120,6 +124,8 @@ int createObjAndSendToModel(Game *game, int ILP){
 	}
 	return 1;
 }
+
+/*sends the arrays to the model*/
 int sendToModel(){
 
 	/* add variables to model */
@@ -143,6 +149,7 @@ int sendToModel(){
 	return 1;
 }
 
+/*finds the index of the variable that represents the ij'th value*/
 int findPlaceForOption(int i,int j,int value){
 	int place;
 	for(place=0;place<number_of_varibals;place++){
@@ -152,9 +159,8 @@ int findPlaceForOption(int i,int j,int value){
 	}
 	return -1;
 }
-/*
- * sets cell constraints (every cell should be filled with exactly one value)
- */
+
+/*sets cell constraints (every cell should be filled with exactly one value)*/
 int setCellConstraints(Game *game){
 	int i,j,place,value,current_k=0;
 	for(i=1;i<=game->board_size;i++){
@@ -203,6 +209,7 @@ int setCellConstraints(Game *game){
 	return 1;
 }
 
+/*sets row constraints*/
 int setRowConstraints(Game *game){
 	int i,j,place,value,current_k=0;
 	for(i=1;i<=game->board_size;i++){
@@ -251,6 +258,8 @@ int setRowConstraints(Game *game){
 	}
 	return 1;
 }
+
+/*sets column constraints*/
 int setColumnConstraints(Game *game){
 	int i,j,place,value,current_k=0;
 	for(i=1;i<=game->board_size;i++){
@@ -297,6 +306,8 @@ int setColumnConstraints(Game *game){
 	}
 	return 1;
 }
+
+/*sets block constraints*/
 int setBlockConstraints(Game *game){
 	int i,j,place,value,current_k=0,row,column;
 	/*for each block*/
@@ -354,6 +365,8 @@ int setBlockConstraints(Game *game){
 	}
 	return 1;
 }
+
+/*bounds the variables between 0 and 1*/
 int createBounds(){
 	int i;
 	lb=(double*)malloc(number_of_varibals*sizeof(double));
@@ -372,44 +385,8 @@ int createBounds(){
 	}
 	return 1;
 }
-int creatRangeConstrainInLp(){
-	int i;
-	for(i=0;i<number_of_varibals;i++){
-		ind = (int*)calloc(1,sizeof(int));
-
-		if(ind==NULL){
-			printf(ERRORMAL);
-			return 0;
-		}
-		val = (double*)calloc(1,sizeof(double));
-
-		if(val==NULL){
-			printf(ERRORMAL);
-			return 0;
-		}
-		ind[0]=i;
-		val[0]=1.0;
 
 
-		error = GRBaddconstr(model, 1, ind, val, GRB_LESS_EQUAL, 1.0, NULL);
-		if (error) {
-			/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
-			free(ind);
-			free(val);
-			return 0;
-		}
-		error = GRBaddconstr(model, 1, ind, val, GRB_GREATER_EQUAL, 0, NULL);
-		if (error) {
-			/*printf("ERROR %d 2st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
-			free(ind);
-			free(val);
-			return 0;
-		}
-		free(ind);
-		free(val);
-	}
-	return 1;
-}
 
 /* Optimize model - need to call this before calculation */
 int optimizeTheModel(){
@@ -432,6 +409,7 @@ int optimizeTheModel(){
 	return 1;
 }
 
+/*gests the solution*/
 int getSol(){
 	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
 	if (error) {
@@ -471,7 +449,9 @@ int end(){
 	}
 	return 0;
 }
-/* Get solution information */
+
+
+/* Gets solution information */
 Game *findHintBoard(Game *game){
 	int i,j,row,column,value;
 	Game *game_sol= initializeGame(game->num_of_rows_in_block,game->num_of_columns_in_block);
@@ -495,6 +475,8 @@ Game *findHintBoard(Game *game){
 	}
 	return game_sol;
 }
+
+/*recieves a cell index and finds a hint*/
 int getHint(int row, int column, Game *game){
 	Game *game_sol;
 	int value;
@@ -503,6 +485,8 @@ int getHint(int row, int column, Game *game){
 	freeGame(game_sol);
 	return value;
 }
+
+/*finds the probabilities for values for the cell i,j */
 int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 	int value,place, num_possible=0,k=0,current_k=0,stop,random;
 	float precent;
@@ -551,7 +535,9 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 	free(arr_of_option_without_precent);
 	return value;
 }
-Game *findGuseeBoard(Game *game,float X){
+
+/*fillAllGuesses helper function*/
+Game *findGuessBoard(Game *game,float X){
 	int i,j;
 	int value;
 	Game *game_sol= initializeGame(game->num_of_rows_in_block,game->num_of_columns_in_block);
@@ -576,13 +562,15 @@ Game *findGuseeBoard(Game *game,float X){
 	}
 	return game_sol;
 }
+
+/*fills the board with guesses with probabilities higher than X*/
 void fillAllGuesses(Game *game,float X){
 	Game *game_sol;
 	int i,j;
 	/*for(i=0;i<100;i++){
 		printf("row=%d, column=%d, value=%d, index=%d, sol=%f\n", obj_value[i].row,obj_value[i].column,obj_value[i].value,i,sol[i]);
 	}*/
-	game_sol=findGuseeBoard(game,X);
+	game_sol=findGuessBoard(game,X);
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			if(game->board[i][j].value==0 && game_sol->board[i][j].value!=0){
@@ -592,6 +580,8 @@ void fillAllGuesses(Game *game,float X){
 	}
 	freeGame(game_sol);
 }
+
+/*prints the guesses corresponding to the received index*/
 void printGuessHint(Game *game, int row, int column){
 	int value,place,count;
 	/*for(i=0;i<number_of_varibals;i++){

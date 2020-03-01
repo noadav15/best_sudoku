@@ -1,3 +1,4 @@
+/*This module implements a stack.*/
 
 
 #include <stdlib.h>
@@ -7,13 +8,13 @@
 
 
 struct Stack {
-	size_t count; 	/** The number of items in the stack. **/
-	StackNode *top;	/** The top item of the stack. **/
+	size_t count;
+	StackNode *top;
 };
 
+/*creates an empty stack*/
 Stack *stackCreate()
 {
-	/* Create a stack and set everything to the default values. */
 	Stack *stack = (Stack *) malloc(sizeof(stack));
 	if(stack==NULL){
 		printf("ERROR: problem with memory allocation\n");
@@ -25,12 +26,14 @@ Stack *stackCreate()
 	return stack;
 }
 
+/*frees the stack and all the memory related to it*/
 void stackDestroy(Stack *stack)
 {
 	stackClean(stack);
 	free(stack);
 }
 
+/*helper function for stackDestroy*/
 void stackClean(Stack *stack){
 
 	StackNode *node;
@@ -51,6 +54,7 @@ StackNode *stackTop(Stack *stack)
 	return stack->top;
 }
 
+/*pushes an element to the stack*/
 bool stackPush(Stack *stack, int i, int j, int *arr_of_options)
 {
 	StackNode *newNode = (StackNode *) malloc(sizeof *newNode);
@@ -67,7 +71,8 @@ bool stackPush(Stack *stack, int i, int j, int *arr_of_options)
 	stack->count += 1;
 	return true;
 }
-/*pre- call only if stack.size>0*/
+
+/*pops an element from the stack*/
 StackNode *stackPop(Stack *stack)
 {
 	StackNode *oldTop;

@@ -1,9 +1,4 @@
-/*
- * stack.h
- *
- *  Created on: Feb 26, 2020
- *      Author: noada
- */
+/*Stack struct*/
 
 #ifndef STACK_H_
 #define STACK_H_

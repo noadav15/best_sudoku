@@ -1,4 +1,4 @@
-/*This module is responsible for the functions related to solving a game board.*/
+/*This module is responsible for the functions related to the stack and number of solutions.*/
 
 
 #include "structs.h"
@@ -10,6 +10,7 @@
  *
  */
 
+/*receives a cell index and fills it's array with its possible options */
 void fillArrWithOption(int *arr_of_options,Game *game,int row,int column){
 	int i,j,value1=0,value2;
 	int column_start_point;
@@ -51,9 +52,7 @@ void setCellForAlgo(int row, int column, int value,Game *game){
 	game->board[row][column].value=value;
 }
 
-/*get the algorithm and put a number in the current cell
- * return 1 if the cell is valid else return 0
- */
+/*receives a cell index and fills it with a valid option */
 int fillCellByAlgo(int row, int column,Game *game, int *arr_of_options){
 	int i=1;
 	for(i=1;i<=game->board_size;i++){
@@ -65,9 +64,8 @@ int fillCellByAlgo(int row, int column,Game *game, int *arr_of_options){
 	}
 	return 0;
 }
-/*get array of option to fill a cell
- * return 1 if there are option available else return 0
- */
+
+/*receives an array and return 1 if not empty and 0 otherwise*/
 int stillHasOptionForCell(int *arr_of_options, Game *game){
 	int i=1;
 	for(i=1;i<=game->board_size;i++){
@@ -78,7 +76,7 @@ int stillHasOptionForCell(int *arr_of_options, Game *game){
 	return 0;
 }
 
- /* */
+ /*implements the backtracking algorithm with a stack*/
 int backTracking(int i, int j, Game *game){
 	Stack *stack= stackCreate();
 	StackNode *node;

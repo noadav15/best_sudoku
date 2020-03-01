@@ -22,7 +22,6 @@ int getSol();
 int end();
 void freeGR();
 int getHint(int row, int column, Game *game);
-int creatRangeConstrainInLp();
 void fillAllGuesses(Game *game,float X);
 int createBounds();
 int sendToModel();
