@@ -244,7 +244,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 			}
 			for(i = 1; i < 4; i++){
 				if(!checkIfStringIsInt(command[i])){
-					printf("ERROR: one of sets parameters isn't an integer\n");
+					printf("ERROR:  parameter %d isn't an integer\n", i);
 					return game;
 				}
 			}
@@ -281,11 +281,11 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 				}
 				for(i = 1; i < 3; i++){
 					if(!checkIfStringIsInt(command[i])){
-						printf("ERROR: one of generates parameters isn't an integer\n");
+						printf("ERROR:  parameter %d isn't an integer\n", i);
 						return game;
 					}
 				}
-				if(generate(game, converStringToInt(command[1]), converStringToInt(command[0]))){
+				if(generate(game, converStringToInt(command[1]), converStringToInt(command[2]))){
 					printBoard(game);
 				}
 				return game;
@@ -305,7 +305,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 					}
 					for(i = 1; i < 3; i++){
 						if(!checkIfStringIsInt(command[i])){
-							printf("ERROR: one of hints parameters isn't an integer\n");
+							printf("ERROR:  parameter %d isn't an integer\n", i);
 							return game;
 						}
 					}
@@ -327,7 +327,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 						}
 						for(i = 1; i < 3; i++){
 							if(!checkIfStringIsInt(command[i])){
-								printf("ERROR: one of guess_hints parameters isn't an integer\n");
+								printf("ERROR:  parameter %d isn't an integer\n", i);
 								return game;
 							}
 						}
