@@ -547,7 +547,7 @@ void save(Game *game, char* save_dir){
  * all the memory related to it*/
 void exitGame(Game *game){
 	freeGame(game);
-	printf("exiting...");
+	printf("exiting...\n");
 	exit(0);
 }
 

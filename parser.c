@@ -386,9 +386,12 @@ Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 		exitGame(game);
 	}
 	fgets(input, 1024, stdin);
+	if(feof(stdin)){
+		exitGame(game);
+	}
 	if(strlen(input) > 256){
 		printf("ERROR: input is too long:\n");
-		return 0;
+		return NULL;
 	}
 	token = strtok(input, delim);
 	while(token != NULL){
@@ -397,10 +400,10 @@ Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 		}
 		command_index++;
 		token = strtok(NULL, delim);
-	}
-	if(command_index == 0){
-		goto start;
-	}
-	return processCommand(game, command, command_index);
+		}
+		if(command_index == 0){
+			goto start;
+		}
+		return processCommand(game, command, command_index);
 }
 

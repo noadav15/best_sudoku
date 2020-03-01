@@ -131,6 +131,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	}
 	token = strtok(NULL, delim);
 	if(check_errors == 1 && checkFixedCells(game) == 0){
+		printf("ERROR: trying to load a board with an erroneous fixed cell\n");
 		goto free;
 	}
 	if(x != board_size || y != board_size || token != NULL){
@@ -164,6 +165,11 @@ void saveToFile(Game *game, char* fileDir){
 				return;
 	}
 	if(game_status == Edit){
+		if(!boardValueAreValid(game)){
+			printf("ERROR: can't save an erroneous board in edit mode\n");
+			fclose(fptr);
+			return;
+		}
 		fixCellsWithValues(game);
 	}
 	sprintf(converted, "%d", game->num_of_columns_in_block);
