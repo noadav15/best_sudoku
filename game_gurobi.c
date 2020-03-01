@@ -22,8 +22,8 @@ int callGurobi(Game *game, int ILP){
 		return -1;
 	}
 	if(!createEmptyModel()){
-			return -1;
-		}
+		return -1;
+	}
 	if(!sendToModel()){
 		return -1;
 	}
@@ -50,7 +50,12 @@ int callGurobi(Game *game, int ILP){
 	return value;
 }
 void validate(Game *game){
-	int value=0;
+	int value=0,valid;
+	valid=boardValueAreValid(game);
+	if(valid==0){
+		printf("there are errors on the board, no solution\n");
+		return;
+	}
 	value=callGurobi(game,1);
 	if(value==1){
 		printf("solution found- board solvable\n");
@@ -114,6 +119,32 @@ int guess(Game *game, float X){
 		return 0;
 	}
 	return 0;
+}
+void guessHint(Game *game, int row, int column){
+	int value=0,valid;
+	valid=boardValueAreValid(game);
+	if(valid==0){
+		printf("there are errors on the board, no solution, no hint\n");
+		return;
+	}
+	if(game->board[row][column].fixed==1||game->board[row][column].fixed!=0){
+		printf("cell not empty can't get an hint\n");
+		return;
+	}
+	value = callGurobi(game,0);
+	if(value==1){
+
+		freeGR();
+	}
+	if(value==0){
+		printf("no solution found- board is not solvable\n");
+		freeGR();
+	}
+	if(value==-1){
+		printf("problem accrued in gurobi\n");
+		freeGR();
+
+	}
 }
 
 

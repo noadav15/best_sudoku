@@ -559,7 +559,7 @@ Game *findGuseeBoard(Game *game,float X){
 	int value;
 	Game *game_sol= initializeGame(game->num_of_rows_in_block,game->num_of_columns_in_block);
 	if(X==0){
-		X=0.00001;
+		X=0.000000000001;
 	}
 	for(i =1; i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
@@ -568,7 +568,6 @@ Game *findGuseeBoard(Game *game,float X){
 			game_sol->board[i][j].fixed=game->board[i][j].fixed;
 		}
 	}
-	printBoard(game_sol);
 	for(i=1;i<=game_sol->board_size;i++){
 		for(j=1;j<=game_sol->board_size;j++){
 			if(game_sol->board[i][j].value==0){
@@ -587,7 +586,6 @@ void fillAllGuesses(Game *game,float X){
 		printf("row=%d, column=%d, value=%d, index=%d, sol=%f\n", obj_value[i].row,obj_value[i].column,obj_value[i].value,i,sol[i]);
 	}*/
 	game_sol=findGuseeBoard(game,X);
-	printBoard(game_sol);
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			if(game->board[i][j].value==0 && game_sol->board[i][j].value!=0){
@@ -595,6 +593,8 @@ void fillAllGuesses(Game *game,float X){
 			}
 		}
 	}
+	printf("game-guess\n");
+	printBoard(game);
 	freeGame(game_sol);
 }
 /* IMPORTANT !!! - Free model and environment */
