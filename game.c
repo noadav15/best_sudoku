@@ -101,8 +101,8 @@ Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block){
 		printf("ERROR: problem with memory allocation\n");
 		exit(0);
 	}
-	game->num_of_columns_in_block = num_of_rows_in_block;
-	game->num_of_rows_in_block = num_of_columns_in_block;
+	game->num_of_columns_in_block = num_of_columns_in_block;
+	game->num_of_rows_in_block = num_of_rows_in_block;
 	game->board_size = num_of_rows_in_block * num_of_columns_in_block;
 	game->move_history = createList();
 	intilizeEmptyBoard(game);
