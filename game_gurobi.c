@@ -213,16 +213,21 @@ int generate(Game *game, int X,int Y){
 	int value=0,valid,count,i,j,k, first=1;
 	Game *copy_game ;
 	Game *game_sol ;
+	count= numberOfEmptyCell(game);
+	if(X<0 || X>=count){
+		printf("first parameter not in range, should be between 0 and %d\n",count);
+		return 0;
+	}
+	if(Y<=0 || Y>(game->board_size*game->board_size)){
+			printf("Second parameter not in range, should be between 0 and %d\n",(game->board_size*game->board_size));
+			return 0;
+		}
 	valid=boardValueAreValid(game);
 	if(valid==0){
-		printf("there are errors on the board, can't generate\n");
+		printf("the board is erroneous\n");
 		return 0;
 	}
-	count= numberOfEmptyCell(game);
-	if(count<X){
-		printf("there are less than %d empty cells, can't generate\n",X);
-		return 0;
-	}
+
 	for(i=0;i<1000;i++){
 		copy_game =(Game*)malloc(sizeof(Game));
 		copyGame(game,copy_game);
