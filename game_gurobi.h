@@ -12,5 +12,6 @@ int validate(Game *game);
 void hint(Game *game, int row,int column);
 int guess(Game *game, float X);
 void guessHint(Game *game, int row, int column);
+int generate(Game *game, int X,int Y);
 
 #endif /* GAME_GUROBI_H_ */

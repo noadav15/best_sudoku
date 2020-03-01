@@ -42,7 +42,7 @@ int createEnv(){
 int noMessages(){
 	error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
 	if (error) {
-		printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -53,7 +53,7 @@ int noMessages(){
 int createEmptyModel(){
 	error = GRBnewmodel(env, &model, "mip1", number_of_varibals, obj, lb, ub, vtype, NULL);
 	if (error) {
-		printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -125,19 +125,19 @@ int sendToModel(){
 	/* add variables to model */
 	error = GRBaddvars(model, number_of_varibals, 0, NULL, NULL, NULL, obj, lb, ub, vtype, NULL);
 	if (error) {
-		printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	/* Change objective sense to maximization */
 	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MINIMIZE);
 	if (error) {
-		printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	/* update the model - to integrate new variables */
 	error = GRBupdatemodel(model);
 	if (error) {
-		printf("ERROR %d GRBupdatemodel(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBupdatemodel(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -189,7 +189,7 @@ int setCellConstraints(Game *game){
 				/*add constrain to mode*/
 				error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 				if (error) {
-					printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+				/*	printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 					free(ind);
 					free(val);
 					return 0;
@@ -238,7 +238,7 @@ int setRowConstraints(Game *game){
 				/*add constrain to mode*/
 				error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 				if (error) {
-					printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+					/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 					free(ind);
 					free(val);
 
@@ -285,7 +285,7 @@ int setColumnConstraints(Game *game){
 				/*add constrain to mode*/
 				error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 				if (error) {
-					printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+					/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 					free(ind);
 					free(val);
 					return 0;
@@ -341,7 +341,7 @@ int setBlockConstraints(Game *game){
 					/*add constrain to mode*/
 					error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 					if (error) {
-						printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+						/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 						free(ind);
 						free(val);
 						return 0;
@@ -393,14 +393,14 @@ int creatRangeConstrainInLp(){
 
 		error = GRBaddconstr(model, 1, ind, val, GRB_LESS_EQUAL, 1.0, NULL);
 		if (error) {
-			printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+			/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 			free(ind);
 			free(val);
 			return 0;
 		}
 		error = GRBaddconstr(model, 1, ind, val, GRB_GREATER_EQUAL, 0, NULL);
 		if (error) {
-			printf("ERROR %d 2st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+			/*printf("ERROR %d 2st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 			free(ind);
 			free(val);
 			return 0;
@@ -420,13 +420,13 @@ int optimizeTheModel(){
 	}
 	error = GRBoptimize(model);
 	if (error) {
-		printf("ERROR %d GRBoptimize(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBoptimize(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	/* Write model to 'mip1.lp' - this is not necessary but very helpful */
 	error = GRBwrite(model, "mip1.lp");
 	if (error) {
-		printf("ERROR %d GRBwrite(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBwrite(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -435,21 +435,21 @@ int optimizeTheModel(){
 int getSol(){
 	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
 	if (error) {
-		printf("ERROR %d GRBgetintattr(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBgetintattr(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 
 	/* get the objective -- the optimal result of the function */
 	error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
 	if (error) {
-		printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 
 	/* get the solution - the assignment to each variable */
 	error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, number_of_varibals, sol);
 	if (error) {
-		printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
+		/*printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -459,17 +459,14 @@ int getSol(){
 int end(){
 	/* solution found */
 	if (optimstatus == GRB_OPTIMAL) {
-		/*	printf("solution found- board solvable\n");*/
 		return 1;
 	}
 	/* no solution found */
 	else if (optimstatus == GRB_INF_OR_UNBD) {
-		/*	printf("no solution found- board unsolvable\n");*/
 		return 0;
 	}
 	/* error or calculation stopped */
 	else {
-		/*	printf("Optimization was stopped early\n");*/
 		return -1;
 	}
 	return 0;
@@ -618,6 +615,8 @@ void printGuessHint(Game *game, int row, int column){
 void freeGR(){
 	free(sol);
 	free(obj);
+	free(ub);
+	free(lb);
 	free(vtype);
 	free(obj_value);
 	GRBfreemodel(model);

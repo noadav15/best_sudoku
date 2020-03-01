@@ -146,14 +146,114 @@ void guessHint(Game *game, int row, int column){
 
 	}
 }
-int randomCellAndValue(Game *copy_game){
+int *randomCell(Game *copy_game){
 	int row, column;
+	int *result=(int*)malloc(2*sizeof(int));
 	row=(rand()%copy_game->board_size)+1;
 	column=(rand()%copy_game->board_size)+1;
 	while(copy_game->board[row][column].value!=0){
 		row=(rand()%copy_game->board_size)+1;
 		column=(rand()%copy_game->board_size)+1;
 	}
-
-	return copy_game->board[row][column].value;
+	result[0]=row;
+	result[1]=column;
+	return result;
 }
+void emptyYCells(Game *copy_game, int Y){
+	int row, column,i;
+	for(i=1;i<=Y;i++){
+		row=(rand()%copy_game->board_size)+1;
+		column=(rand()%copy_game->board_size)+1;
+		while(copy_game->board[row][column].value==0){
+			row=(rand()%copy_game->board_size)+1;
+			column=(rand()%copy_game->board_size)+1;
+		}
+		copy_game->board[row][column].value=0;
+		copy_game->board[row][column].fixed=0;
+		copy_game->board[row][column].invalid=0;
+	}
+}
+int fillXCells(Game *copy_game, int X){
+	int value=0,count,*indexes,random_index,count_X;
+	int *arr_of_option;
+	for(count_X=1;count_X<=X ;count_X++){
+		arr_of_option= (int*)calloc(copy_game->board_size+1,sizeof(int));
+		indexes = randomCell(copy_game);
+		fillArrWithOption(arr_of_option,copy_game,indexes[0],indexes[1]);
+		if(stillHasOptionForCell(arr_of_option,copy_game)){
+			count=0;
+			for(value=1;value<=copy_game->board_size;value++){
+				if(arr_of_option[value]==0){
+					count++;
+				}
+			}
+			random_index=rand()%count;
+			count =0;
+			for(value=1;value<=copy_game->board_size;value++){
+				if(arr_of_option[value]==0){
+					if(count==random_index){
+						copy_game->board[indexes[0]][indexes[1]].value=value;
+					}
+					count++;
+				}
+			}
+		}
+		else{
+			free(indexes);
+			free(arr_of_option);
+			return 0;
+		}
+		free(indexes);
+		free(arr_of_option);
+	}
+	return 1;
+}
+
+int generate(Game *game, int X,int Y){
+	int value=0,valid,count,i,j,k, first=1;
+	Game *copy_game ;
+	Game *game_sol ;
+	valid=boardValueAreValid(game);
+	if(valid==0){
+		printf("there are errors on the board, can't generate\n");
+		return 0;
+	}
+	count= numberOfEmptyCell(game);
+	if(count<X){
+		printf("there are less than %d empty cells, can't generate\n",X);
+		return 0;
+	}
+	for(i=0;i<1000;i++){
+		copy_game =(Game*)malloc(sizeof(Game));
+		copyGame(game,copy_game);
+		/*fill X cells*/
+		valid= fillXCells(copy_game,X);
+		if(valid){
+			/*after fill X cell valid do ILP*/
+			value=callGurobi(copy_game,1);
+			if(value==1){
+				game_sol= findHintBoard(copy_game);
+				/*empty Y cells*/
+				emptyYCells(game_sol,Y);
+				for(j=1;j<=game->board_size;j++){
+					for(k=1;k<=game->board_size;k++){
+						setCell(j,k,game_sol->board[j][k].value,game,first);
+						first=0;
+					}
+				}
+				freeGame(copy_game);
+				freeGame(game_sol);
+				freeGR();
+				return 1;
+			}
+			freeGR();
+		}
+		freeGame(copy_game);
+	}
+	printf("generate didn't find any cells to fill\n");
+	return 0;
+}
+
+
+
+

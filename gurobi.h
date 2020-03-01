@@ -27,5 +27,6 @@ void fillAllGuesses(Game *game,float X);
 int createBounds();
 int sendToModel();
 void printGuessHint(Game *game, int row, int column);
+Game *findHintBoard(Game *game);
 
 #endif /* GUROBI_H_ */
