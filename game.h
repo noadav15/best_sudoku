@@ -70,4 +70,8 @@ Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block);
 
 /*checks whether a cell is valid and returns 1 or 0 otherwise*/
 int invalidCell(Game *game, int row , int column, int ignore_not_fixed);
+
+int numberOfEmptyCell(Game *game);
+
+void copyGame(Game *game, Game *copy_game);
 #endif /* GAME_H_ */

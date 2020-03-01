@@ -432,6 +432,8 @@ void copyGame(Game *game, Game *copy_game){
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			copy_game->board[i][j].value= game->board[i][j].value;
+			copy_game->board[i][j].fixed= game->board[i][j].fixed;
+			copy_game->board[i][j].invalid= game->board[i][j].invalid;
 		}
 	}
 }
@@ -549,6 +551,17 @@ void exitGame(Game *game){
 	freeGame(game);
 	printf("exiting...\n");
 	exit(0);
+}
+int numberOfEmptyCell(Game *game){
+	int count=0,i,j;
+	for(i=1;i<=game->board_size;i++){
+		for(j=1;j<=game->board_size;j++){
+			if(game->board[i][j].value==0){
+				count++;
+			}
+		}
+	}
+	return count;
 }
 
 
