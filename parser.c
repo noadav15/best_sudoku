@@ -1,3 +1,4 @@
+/*This module is responsible for the functions related to the user input.*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +8,7 @@
 #include "solve.h"
 #include "game.h"
 
+/*returns 1 if the input string represents an integer and 0 otherwise*/
 int checkIfStringIsInt(char *str){
 	int i;
 	int str_len = strlen(str);
@@ -18,9 +20,35 @@ int checkIfStringIsInt(char *str){
 	return 1;
 }
 
+/*returns 1 if the input string represents a float and 0 otherwise*/
+int checkIfStringIsFloat(char *str){
+	int countDots = 0, i = 0;
+	int str_len = strlen(str);
+	for(i = 0; i < str_len; i++){
+		if(str[i] == '.'){
+			countDots++;
+		}
+		else if(!isdigit(str[i])){
+			return 0;
+		}
+	}
+	if(countDots != 1){
+		return 0;
+	}
+	return 1;
+}
+
+/*converts a string representing a float to float*/
+float convertStringToFloat(char *str){
+	return atof(str);
+}
+
+/*converts a string representing an int to int*/
 int converStringToInt(char *str){
 	return atoi(str);
 }
+
+/*resets the input array*/
 void initInput(char input[1024]){
 	int i;
 	for(i = 0; i < 1024; i++){
@@ -28,6 +56,7 @@ void initInput(char input[1024]){
 	}
 }
 
+/*resets the command array*/
 void initCommand(char command[4][1024]){
 	int i;
 	int j;
@@ -39,9 +68,11 @@ void initCommand(char command[4][1024]){
 }
 
 
+/*checks whether a command is valid and calls the right function for this command.*/
 Game* processCommand(Game *game, char command[4][1024], int command_length){
 	Game *out_game;
 	int num_of_sol, fill_ret, i, set_ret;
+	float converted_float;
 	char *commandType = command[0];
 	/*printf("command length: %d\n", command_length);*/
 	if(!strcmp(commandType, "solve")){
@@ -222,6 +253,112 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 			}
 			return game;
 	}
+	else if(!strcmp(commandType, "validate")){
+					if(command_length > 1){
+							printf("ERROR: validate command doesn't have parameters\n");
+							return game;
+					}
+					if(game_status != Solve && game_status != Edit){
+								printf("ERROR: validate command is only available in Solve or Edit mode\n");
+								return game;
+					}
+					/*call validate here!*/
+					return game;
+		}
+	else if(!strcmp(commandType, "generate")){
+				if(command_length > 3){
+					printf("ERROR: too many parameters for generate, please enter 2 parameters\n");
+					return game;
+				}
+				if(command_length == 1 || command_length == 2){
+					printf("ERROR: not enough parameters for generate, please enter 2 parameters\n");
+					return game;
+				}
+				if(game_status != Edit){
+								printf("ERROR: generate command is only available in Edit mode\n");
+								return game;
+				}
+				for(i = 1; i < 3; i++){
+					if(!checkIfStringIsInt(command[i])){
+						printf("ERROR: one of generates parameters isn't an integer\n");
+						return game;
+					}
+				}
+				/*call generate here!*/
+				return game;
+		}
+	else if(!strcmp(commandType, "hint")){
+					if(command_length > 3){
+						printf("ERROR: too many parameters for hint, please enter 2 parameters\n");
+						return game;
+					}
+					if(command_length == 1 || command_length == 2){
+						printf("ERROR: not enough parameters for hint, please enter 2 parameters\n");
+						return game;
+					}
+					if(game_status != Solve){
+									printf("ERROR: hint command is only available in Solve mode\n");
+									return game;
+					}
+					for(i = 1; i < 3; i++){
+						if(!checkIfStringIsInt(command[i])){
+							printf("ERROR: one of hints parameters isn't an integer\n");
+							return game;
+						}
+					}
+					/*call hint here!*/
+					return game;
+			}
+	else if(!strcmp(commandType, "guess_hint")){
+						if(command_length > 3){
+							printf("ERROR: too many parameters for guess_hint, please enter 2 parameters\n");
+							return game;
+						}
+						if(command_length == 1 || command_length == 2){
+							printf("ERROR: not enough parameters for guess_hint, please enter 2 parameters\n");
+							return game;
+						}
+						if(game_status != Solve){
+										printf("ERROR: guess_hint command is only available in Solve mode\n");
+										return game;
+						}
+						for(i = 1; i < 3; i++){
+							if(!checkIfStringIsInt(command[i])){
+								printf("ERROR: one of guess_hints parameters isn't an integer\n");
+								return game;
+							}
+						}
+						/*call guess_hint here!*/
+						return game;
+				}
+	else if(!strcmp(commandType, "guess")){
+							if(command_length > 2){
+								printf("ERROR: too many parameters for guess, please enter 1 parameter\n");
+								return game;
+							}
+							if(command_length == 1){
+								printf("ERROR: not enough parameters for guess, please enter 1 parameter\n");
+								return game;
+							}
+							if(game_status != Solve){
+											printf("ERROR: guess command is only available in Solve mode\n");
+											return game;
+							}
+							if(checkIfStringIsFloat(command[1])){
+								converted_float = convertStringToFloat(command[1]);
+								if(converted_float >= 0 && converted_float <= 1){
+									/*call guess on convertStringToFloat(command[1])
+									 * print board if successful*/
+								}
+								else{
+									printf("ERROR: guess parameter value should be between 0 and 1\n");
+								}
+							}
+							else{
+								printf("ERROR: guess parameter isn't a float\n");
+							}
+							return game;
+					}
 	else{
 		printf("ERROR: invalid command\n");
 		return game;
@@ -233,18 +370,19 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 	return game;
 }
 
-
+/*gets the command from the user and calls processCommand to process it*/
 Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 	char* token;
 	int command_index = 0;
 	const char delim[] = " \t\r\n";
+	printf("Please enter a command:\n");
+	start:
 	initInput(input);
 	initCommand(command);
 	fflush(stdin);
 	if(feof(stdin)){
 		exitGame(game);
 	}
-	printf("Please enter a command:\n");
 	fgets(input, 1024, stdin);
 	if(strlen(input) > 256){
 		printf("ERROR: input is too long:\n");
@@ -257,6 +395,9 @@ Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 		}
 		command_index++;
 		token = strtok(NULL, delim);
+	}
+	if(command_index == 0){
+		goto start;
 	}
 	return processCommand(game, command, command_index);
 }

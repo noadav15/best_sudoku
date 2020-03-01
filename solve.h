@@ -1,13 +1,5 @@
-/*
- * solve.h
- *
- *  Created on: Feb 25, 2020
- *      Author: noada
- */
-/*
- * solver.c
- * This module implements the backtracking algorithm.
- */
+/*This module is responsible for the functions related to solving a game board.*/
+
 
 #ifndef SOLVE_H_
 #define SOLVE_H_

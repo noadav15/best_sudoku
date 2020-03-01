@@ -1,7 +1,4 @@
-/*
- * structs.h
- * this module contains all the structs that are needed for the game.
- */
+/*this module contains all the structs that are needed for the game and its board.*/
 
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
@@ -9,6 +6,7 @@
 enum status{Init, Edit, Solve};
 enum status game_status;
 int mark_errors;
+
 typedef struct{
 	int invalid;
 	int value;

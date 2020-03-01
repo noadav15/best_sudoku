@@ -1,9 +1,4 @@
-/*
- * game.c
- *
- *  Created on: Feb 25, 2020
- *      Author: noada
- */
+/*This module is responsible for the functions related to the game board.*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +9,7 @@
 #include "solve.h"
 
 
-/*print cell*/
+/*prints a cell*/
 void printCell(Cell *c){
 	if(c->value!=0){
 		int value= c->value;
@@ -42,7 +37,8 @@ void printRowSepration(Game *game){
 	}
 	printf("\n");
 }
-/*print part of the board game*/
+
+/*prints part of the game board*/
 void printBlockRow(int i, Game *game){
 	int j=1,k=0;
 	printRowSepration(game);
@@ -56,7 +52,8 @@ void printBlockRow(int i, Game *game){
 		printf("|\n");
 	}
 }
-/*print game board*/
+
+/*prints the game board*/
 void printBoard(Game *game){
 	int k;
 	for(k=0;k<game->num_of_columns_in_block;k++){
@@ -65,15 +62,16 @@ void printBoard(Game *game){
 	printRowSepration(game);
 }
 
-/*fill cell to be empty cell*/
-void intilizeEmptyCell(Cell *c){
+/*initializes an empty cell*/
+void initializeEmptyCell(Cell *c){
 	c->fixed=0;
 	c->value=0;
 	c->invalid=0;
 
 }
-/*Create an empty board game*/
-void intilizeEmptyBoard(Game *game){
+
+/*Creates an empty game board*/
+void initializeEmptyBoard(Game *game){
 	int i=1,j=1;
 	game->board = (Cell**)malloc((game->board_size+1)*sizeof(Cell*));
 	if(game->board==NULL){
@@ -89,12 +87,13 @@ void intilizeEmptyBoard(Game *game){
 	}
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
-			intilizeEmptyCell(&game->board[i][j]);
+			initializeEmptyCell(&game->board[i][j]);
 		}
 	}
 
 }
 
+/*receives the desired number of rows and columns in a block and initializes a new game*/
 Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block){
 	Game *game = (Game*)malloc(sizeof(Game));
 	if(game==NULL){
@@ -105,11 +104,12 @@ Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block){
 	game->num_of_rows_in_block = num_of_rows_in_block;
 	game->board_size = num_of_rows_in_block * num_of_columns_in_block;
 	game->move_history = createList();
-	intilizeEmptyBoard(game);
+	initializeEmptyBoard(game);
 	return game;
 }
-/*check if the game board current row values are valid
- * return 1 if valid, else return 0
+
+/*receives a row index and checks whether the values in this row are valid.
+ * returns 1 if valid and 0 otherwise.
  */
 int checkRowValid(int row ,Game *game){
 	int i=1;
@@ -134,8 +134,9 @@ int checkRowValid(int row ,Game *game){
 	free(arr);
 	return 1;
 }
-/*/*check if the game board current column values are valid
- * return 1 if valid, else return 0
+
+/*receives a column index and checks whether the values in this column are valid.
+ * returns 1 if valid and 0 otherwise.
  */
 int checkColumnValid(int column,Game *game){
 	int i=1;
@@ -160,8 +161,9 @@ int checkColumnValid(int column,Game *game){
 	free(arr);
 	return 1;
 }
-/*/*check if the game board current block values are valid
- * return 1 if valid, else return 0
+
+/*receives the first cell index of a block and checks whether the values in this block are valid.
+ * returns 1 if valid and 0 otherwise.
  */
 int checkBlockValid(int row,int column,Game *game){
 	int i,j,value;
@@ -187,9 +189,9 @@ int checkBlockValid(int row,int column,Game *game){
 	free(arr);
 	return 1;
 }
-/*check if the game board values are valid
- * return 1 if valid, else return 0
- */
+
+/*checks if all board game values are valid.
+ * return 1 if valid and 0 otherwise.*/
 int boardValueAreValid(Game *game){
 	int i,correct,j;
 	for(i=1;i<=game->board_size;i++){
@@ -216,12 +218,9 @@ int boardValueAreValid(Game *game){
 }
 
 
-/*sets cell in game board (z > 0)
- * if illegal input and returns returns 0
- * if cell is fixed prints: cell is fixed and returns 0
- * if cell exists in one of it's neighbors prints: value is invalid and returns 0
- * otherwise, keeps the cell and returns 1
- * */
+/*receives the cell index, desired new value and start = {0,1} (start == 1 -> first move of a chain of moves).
+ *updates the cell if all values are valid and the game isn't in Init mode
+ *returns 1	if successful and 0 otherwise*/
 int setCell(int x, int y, int z, Game *game, int start){
 	Cell cur_cell;
 	int max_value;
@@ -254,6 +253,8 @@ int setCell(int x, int y, int z, Game *game, int start){
 	return 1;
 }
 
+/*receives a Move object and Undo = {0,1} (Undo == 1 -> Undo Move and Undo == 0 -> Redo Move).
+ *changes the board accordingly until reaching the next move*/
 void setCellsByMove(Game *game, Move *move, int undo){
 	while(move->next != NULL && !move->next->move_start){
 		move = move->next;
@@ -262,9 +263,11 @@ void setCellsByMove(Game *game, Move *move, int undo){
 		int y = move->row;
 		int x = move->column;
 		if(undo){
+			printf("undo: changed cell [%d][%d] back from %d to %d\n", x, y, move->after_value, move->before_value);
 			(game->board)[y][x].value = move->before_value;
 		}
 		else{
+			printf("redo: changed cell [%d][%d] from %d to %d\n", x, y, move->before_value, move->after_value);
 			(game->board)[y][x].value = move->after_value;
 		}
 		(game->board)[y][x].fixed = move->fixed;
@@ -276,6 +279,7 @@ void setCellsByMove(Game *game, Move *move, int undo){
 	}
 }
 
+/*undo move*/
 int undoMove(Game *game){
 	Move *move = undo(game->move_history);
 	if(move == NULL){
@@ -286,6 +290,7 @@ int undoMove(Game *game){
 	return 1;
 }
 
+/*redo move*/
 int redoMove(Game *game){
 	Move *move = redo(game->move_history);
 	if(move == NULL){
@@ -296,6 +301,7 @@ int redoMove(Game *game){
 	return 1;
 }
 
+/*resets the board to it's first state according to it's move history*/
 void resetBoard(Game *game){
 	Move *move = undo(game->move_history);
 	while(move != NULL){
@@ -304,6 +310,7 @@ void resetBoard(Game *game){
 	}
 }
 
+/*turns all cells with values to fixed cells*/
 void fixCellsWithValues(Game *game){
 	int i, j;
 	for(i=1;i<=game->board_size;i++){
@@ -316,6 +323,7 @@ void fixCellsWithValues(Game *game){
 
 }
 
+/*frees the game object and all related memory to it*/
 void freeGame(Game *game){
 	int i;
 	if(game == NULL){
@@ -330,6 +338,7 @@ void freeGame(Game *game){
 
 }
 
+/*checks whether a cell is valid and returns 1 or 0 otherwise*/
 int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 	int i,j,start_i,start_j,value;
 	value=game->board[row][column].value;
@@ -384,6 +393,8 @@ int invalidCell(Game *game, int row , int column, int ignore_not_fixed){
 	}
 	return 0;
 }
+
+/*sets the invalid field of all invalid cells in the board to 1 (true)*/
 void markInvalidCells(Game *game){
 	int i, j;
 	for(i=1;i<=game->board_size;i++){
@@ -393,6 +404,9 @@ void markInvalidCells(Game *game){
 		}
 	}
 }
+
+/*check if the input array has only one valid option,
+ * returns 1 if true and 0 otherwise*/
 int oneValidOption(int *arr,Game *game){
 	int count=0,i=1,value=0;
 	for (i=1; i<= game->board_size;i++){
@@ -406,19 +420,24 @@ int oneValidOption(int *arr,Game *game){
 	}
 	return 0;
 }
+
+/*copies one game to another*/
 void copyGame(Game *game, Game *copy_game){
 	int i,j;
 	copy_game->move_history = createList();
 	copy_game->num_of_columns_in_block=game->num_of_columns_in_block;
 	copy_game->num_of_rows_in_block=game->num_of_rows_in_block;
 	copy_game->board_size=game->board_size;
-	intilizeEmptyBoard(copy_game);
+	initializeEmptyBoard(copy_game);
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			copy_game->board[i][j].value= game->board[i][j].value;
 		}
 	}
 }
+
+/*autofills all cells which have only one possible value.
+ * returns 1 if autofill was successful and 0 otherwise */
 int autoFillBoard(Game *game){
 	int i=1, j=1, value,start=1;
 	Game *copy_game;
@@ -458,6 +477,8 @@ int autoFillBoard(Game *game){
 	return 1;
 }
 
+/*checks if all fixed cells are valid in relation to all the other fixed cells,
+ * returns 1 if true and 0 otherwise*/
 int checkFixedCells(Game *game){
 	int i, j;
 	for(i=1;i<=game->board_size;i++){
@@ -472,6 +493,8 @@ int checkFixedCells(Game *game){
 	return 1;
 }
 
+/*imports a game from a file in Edit mode, if the file name provided is an empty string,
+ * initializes a new game with 3x3 blocks board.*/
 Game* edit(char* fileName){
 	Game *game;
 	if(strcmp(fileName, "") == 0){
@@ -486,6 +509,7 @@ Game* edit(char* fileName){
 	return game;
 }
 
+/*imports a game from a file in Solve mode.*/
 Game* solve(char* fileName){
 	Game *game;
 	game = readFromFile(fileName, 1);
@@ -495,6 +519,8 @@ Game* solve(char* fileName){
 	return game;
 }
 
+/*sets the mar_errors field to 1 or 0 indicating whether to mark errors or not
+ * when printing the game board.*/
 void markErrors(int mark){
 	if(mark == 0){
 		mark_errors = 0;
@@ -504,6 +530,7 @@ void markErrors(int mark){
 	}
 }
 
+/*the function saves the current game to the save directory provided to it*/
 void save(Game *game, char* save_dir){
 	if(game_status != Solve && game_status != Edit){
 		printf("ERROR: The save command is only available in Solve or Edit mode\n");
@@ -512,6 +539,8 @@ void save(Game *game, char* save_dir){
 	saveToFile(game, save_dir);
 }
 
+/*exits the game cleanly, calls the freeGame function to clear the current game and
+ * all the memory related to it*/
 void exitGame(Game *game){
 	freeGame(game);
 	printf("exiting...");

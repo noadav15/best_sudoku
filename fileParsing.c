@@ -1,4 +1,5 @@
-
+/*This module is responsible for the functions related to importing and exporting the game
+ * to and from a file.*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +8,8 @@
 #include "game.h"
 #include "parser.h"
 
+/*checks whether a string is a representation of a non fixed cell.
+ * returns 1 if true and 0 otherwise*/
 int checkFormatNotFixed(char* token){
 	if(strlen(token) > 0){
 			if(checkIfStringIsInt(token)){
@@ -15,6 +18,9 @@ int checkFormatNotFixed(char* token){
 	}
 	return 0;
 }
+
+/*checks whether a string is a representation of a fixed cell.
+ * returns 1 if true and 0 otherwise*/
 int checkFormatFixed(char* token){
 	char check[1024];
 	if(strlen(token) >= 2){
@@ -26,6 +32,8 @@ int checkFormatFixed(char* token){
 	return 0;
 }
 
+/*checks whether a string is a representation of a board size.
+ * returns 1 if true and 0 otherwise*/
 int checkMN(char *token){
 	if(token == NULL){
 				printf("ERROR: invalid format\n");
@@ -38,7 +46,7 @@ int checkMN(char *token){
 	return 1;
 }
 
-
+/*imports a game board from fileDir, returns it if successful and NULL otherwise*/
 Game* readFromFile(char* fileDir, int check_errors){
 	int num_of_columns_in_block, num_of_rows_in_block, board_size;
 	long file_size;
@@ -120,13 +128,11 @@ Game* readFromFile(char* fileDir, int check_errors){
 	      else{
 	    	  x++;
 	      }
-
 	}
 	token = strtok(NULL, delim);
 	if(check_errors == 1 && checkFixedCells(game) == 0){
 		goto free;
 	}
-
 	if(x != board_size || y != board_size || token != NULL){
 		free:
 		printf("ERROR: invalid format\n");
@@ -147,6 +153,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	return game;
 }
 
+/*the function saves the current game to the save directory provided to it*/
 void saveToFile(Game *game, char* fileDir){
 	int i, j;
 	Cell cur;

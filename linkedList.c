@@ -1,10 +1,12 @@
+/*This module is responsible for the functions related to the MoveHistory doubly linked list.
+ *Each list node represnts a move and stores all the related information to it.*/
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "linkedList.h"
 
-int count_aloc;
-int count_free;
+/*creates an empty move which indicates that this is the edge of the linked list and returns it*/
 Move* createEdge(){
 	Move *move = (Move*)malloc(sizeof(Move));
 	if(move == NULL){
@@ -17,6 +19,8 @@ Move* createEdge(){
 
 	return move;
 }
+
+/*creates a new linked list with an edge as it's first and only node*/
 MoveList* createList(){
 	MoveList *list = NULL;
 	list = (MoveList*)malloc(sizeof(MoveList));
@@ -28,6 +32,7 @@ MoveList* createList(){
 	return list;
 }
 
+/*receives move information, creates a move node and returns it*/
 Move* createMove(int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
 	Move *move = (Move*)malloc(sizeof(Move));
 	if(move == NULL){
@@ -46,6 +51,8 @@ Move* createMove(int row, int column, int invalid, int before_value, int after_v
 	move->edge = 0;
 	return move;
 }
+
+/*deletes the list and frees all related memory to it*/
 void clearList(MoveList *list){
 	Move *temp = list->cur_move;
 	Move *prev;
@@ -63,44 +70,7 @@ void clearList(MoveList *list){
 	skip: free(list);
 }
 
-/*void clearListUndone(MoveList *list){
-	Move *temp = list->cur_move;
-	Move *ref = list->cur_move;
-	while(temp->next != NULL){
-		temp = temp->next;
-	}
-	while(ref->next != NULL){
-		if(ref->next->move_start){
-			break;
-		}
-		ref = ref->next;
-
-	}
-	while(temp != ref){
-		temp = temp->prev;
-		free(temp->next);
-	}
-	if(ref->next != NULL){
-		free(ref->next);
-	}
-	ref->next = NULL;
-
-}
-void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
-	Move *temp;
-	Move *move = createMove(row, column, invalid, before_value, after_value, fixed, move_start);
-	clearListUndone(list);
-	temp = list->cur_move;
-	while(temp->next != NULL){
-		temp = temp->next;
-	}
-	move->prev = temp;
-	temp->next = move;
-	if(move->move_start){
-		list->cur_move = move;
-	}
-}*/
-
+/*adds a new move to the list*/
 void insertToList(MoveList *list, int row, int column, int invalid, int before_value, int after_value, int fixed, int move_start){
 	Move *temp;
 	Move *del;
@@ -122,6 +92,8 @@ void insertToList(MoveList *list, int row, int column, int invalid, int before_v
 		list->cur_move = move;
 	}
 }
+
+/*returns a pointer to the move that needs to be undone and moves the list pointer accordingly*/
 Move* undo(MoveList *list){
 	Move* ret = list->cur_move;
 	if(ret->edge){
@@ -134,6 +106,7 @@ Move* undo(MoveList *list){
 	return ret;
 }
 
+/*returns a pointer to the move that needs to be redon and moves the list pointer accordingly*/
 Move* redo(MoveList *list){
 	Move *temp = list->cur_move;
 	temp = temp->next;

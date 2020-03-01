@@ -1,7 +1,4 @@
-/*
- * solver.c
- * This module implements the backtracking algorithm.
- */
+/*This module is responsible for the functions related to solving a game board.*/
 
 
 #include "structs.h"
@@ -48,10 +45,12 @@ void fillArrWithOption(int *arr_of_options,Game *game,int row,int column){
 		}
 	}
 }
-/*get the cell index and value and update the cell */
+
+/*gets cell index and value and updates the cell */
 void setCellForAlgo(int row, int column, int value,Game *game){
 	game->board[row][column].value=value;
 }
+
 /*get the algorithm and put a number in the current cell
  * return 1 if the cell is valid else return 0
  */
@@ -78,8 +77,8 @@ int stillHasOptionForCell(int *arr_of_options, Game *game){
 	}
 	return 0;
 }
-/*backtracking algorithm as we saw at class
- * return 1 if there a solution else return 0 */
+
+ /* */
 int backTracking(int i, int j, Game *game){
 	Stack *stack= stackCreate();
 	StackNode *node;
@@ -87,7 +86,6 @@ int backTracking(int i, int j, Game *game){
 	int succeed=0,count=0;
 	int *arr_of_options;
 	while(1){
-		/*if the cell already not empty continue to next*/
 		if(game->board[i][j].value!=0){
 			if(j<game->board_size){
 				j++;
@@ -97,7 +95,6 @@ int backTracking(int i, int j, Game *game){
 					i++;
 					j=1;
 				}
-				/*the last item not empty*/
 				else{
 					count++;
 					if(stackSize(stack)>0){
@@ -105,14 +102,13 @@ int backTracking(int i, int j, Game *game){
 						i=node->i;
 						j=node->j;
 						arr_of_options=node->arr_of_options;
-						intilizeEmptyCell(&game->board[i][j]);
+						initializeEmptyCell(&game->board[i][j]);
 						going_back=1;
 						free(node);
 					}
 				}
 			}
 		}
-		/*should fill the cell*/
 		else{
 			if(going_back==0){
 				arr_of_options=(int*)calloc(game->board_size+1,sizeof(int));
@@ -138,17 +134,16 @@ int backTracking(int i, int j, Game *game){
 						j=1;
 						going_back=0;
 					}
-					/*the last item not empty*/
 					else{
 						count++;
 						free(arr_of_options);
-						intilizeEmptyCell(&game->board[i][j]);
+						initializeEmptyCell(&game->board[i][j]);
 						if(stackSize(stack)>0){
 							node= stackPop(stack);
 							i=node->i;
 							j=node->j;
 							arr_of_options=node->arr_of_options;
-							intilizeEmptyCell(&game->board[i][j]);
+							initializeEmptyCell(&game->board[i][j]);
 							going_back=1;
 							free(node);
 						}
@@ -163,7 +158,7 @@ int backTracking(int i, int j, Game *game){
 					j=node->j;
 					arr_of_options=node->arr_of_options;
 					arr_of_options[game->board[i][j].value]++;
-					intilizeEmptyCell(&game->board[i][j]);
+					initializeEmptyCell(&game->board[i][j]);
 					going_back=1;
 					free(node);
 				}
@@ -174,13 +169,10 @@ int backTracking(int i, int j, Game *game){
 			}
 		}
 	}
-	/*should never be here*/;
 	return count;
 }
-/*algorithem Deterministic
- * get board and return 1 if there a solution to the board and update the board
- * if there no solution return 0
- */
+
+/*returns the number of possible solutions for the game using a stack*/
 int countSolutions(Game *game){
 	int i=1,j=1, start_index_row, start_index_column, check=0;
 	if(!boardValueAreValid(game)){
