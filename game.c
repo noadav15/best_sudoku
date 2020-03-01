@@ -552,6 +552,8 @@ void exitGame(Game *game){
 	printf("exiting...\n");
 	exit(0);
 }
+
+/*returns the number of empty cells in the board*/
 int numberOfEmptyCell(Game *game){
 	int count=0,i,j;
 	for(i=1;i<=game->board_size;i++){
