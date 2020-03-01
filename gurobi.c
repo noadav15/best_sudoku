@@ -478,8 +478,6 @@ int end(){
 Game *findHintBoard(Game *game){
 	int i,j,row,column,value;
 	Game *game_sol= initializeGame(game->num_of_rows_in_block,game->num_of_columns_in_block);
-	printf("im here\n");
-	printBoard(game_sol);
 	for(i =1; i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			game_sol->board[i][j].value=game->board[i][j].value;
@@ -504,7 +502,6 @@ int getHint(int row, int column, Game *game){
 	Game *game_sol;
 	int value;
 	game_sol=findHintBoard(game);
-	printBoard(game_sol);
 	value= game_sol->board[row][column].value;
 	freeGame(game_sol);
 	return value;
@@ -514,6 +511,7 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 	float precent;
 	float *arr_of_option_without_precent= (float*)calloc(game_sol->board_size+1,sizeof(float));
 	int *arr_of_option_precent;
+
 	for(value=1;value<=game_sol->board_size;value++){
 		place=findPlaceForOption(i,j,value);
 		precent=sol[place];
@@ -560,6 +558,9 @@ Game *findGuseeBoard(Game *game,float X){
 	int i,j;
 	int value;
 	Game *game_sol= initializeGame(game->num_of_rows_in_block,game->num_of_columns_in_block);
+	if(X==0){
+		X=0.00001;
+	}
 	for(i =1; i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			game_sol->board[i][j].value=game->board[i][j].value;
@@ -573,6 +574,7 @@ Game *findGuseeBoard(Game *game,float X){
 			if(game_sol->board[i][j].value==0){
 				value=getValueForCellByPrecent(game_sol, i, j,X);
 				game_sol->board[i][j].value=value;
+
 			}
 		}
 	}
@@ -585,6 +587,7 @@ void fillAllGuesses(Game *game,float X){
 		printf("row=%d, column=%d, value=%d, index=%d, sol=%f\n", obj_value[i].row,obj_value[i].column,obj_value[i].value,i,sol[i]);
 	}*/
 	game_sol=findGuseeBoard(game,X);
+	printBoard(game_sol);
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			if(game->board[i][j].value==0 && game_sol->board[i][j].value!=0){
