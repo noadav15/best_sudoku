@@ -1,9 +1,4 @@
-/*
- * game_gurobi.c
- *
- *  Created on: Feb 28, 2020
- *      Author: noada
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "game.h"

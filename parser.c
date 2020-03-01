@@ -7,6 +7,7 @@
 #include "structs.h"
 #include "solve.h"
 #include "game.h"
+#include "game_gurobi.h"
 
 /*returns 1 if the input string represents an integer and 0 otherwise*/
 int checkIfStringIsInt(char *str){
@@ -262,7 +263,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 								printf("ERROR: validate command is only available in Solve or Edit mode\n");
 								return game;
 					}
-					/*call validate here!*/
+					validate(game);
 					return game;
 		}
 	else if(!strcmp(commandType, "generate")){
@@ -306,7 +307,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 							return game;
 						}
 					}
-					/*call hint here!*/
+					hint(game, converStringToInt(command[2]), converStringToInt(command[1]));
 					return game;
 			}
 	else if(!strcmp(commandType, "guess_hint")){
@@ -347,8 +348,9 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 							if(checkIfStringIsFloat(command[1])){
 								converted_float = convertStringToFloat(command[1]);
 								if(converted_float >= 0 && converted_float <= 1){
-									/*call guess on convertStringToFloat(command[1])
-									 * print board if successful*/
+									if(guess(game, convertStringToFloat(command[1]))){
+										printBoard(game);
+									}
 								}
 								else{
 									printf("ERROR: guess parameter value should be between 0 and 1\n");

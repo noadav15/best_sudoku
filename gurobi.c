@@ -1,9 +1,4 @@
-/*
- * gurobi.c
- *
- *  Created on: Feb 27, 2020
- *      Author: noada
- */
+
 #define ERRORMAL "ERROR: problem with memory allocation\n"
 #define ERRORGUR "Error: Gurobi optimizer has failed\n"
 #include <stdlib.h>
