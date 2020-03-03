@@ -11,7 +11,7 @@ int main(){
 		char input[1024];
 		char command[4][1024];
 		Game *game = NULL;
-		game_status = Init;
+		changeToInit();
 		printf("Noa and Tal's sudoku :D\n");
 		while(1){
 			game = getCommand(game, input, command);

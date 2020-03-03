@@ -233,7 +233,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 			return game;
 	}
 	else if(!strcmp(commandType, "set")){
-			if(game_status == Init){
+			if(game_status != Solve && game_status != Edit){
 				printf("Error: Set isn't available in Init mode\n");
 				return 0;
 			}
@@ -380,6 +380,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 
 /*gets the command from the user and calls processCommand to process it*/
 Game* getCommand(Game *game, char input[1024], char command[4][1024]){
+	Game *out;
 	char* token;
 	int command_index = 0;
 	const char delim[] = " \t\r\n";
@@ -410,11 +411,12 @@ Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 	if(command_index == 0){
 		goto start;
 	}
-	if(game_status == Solve && isWin(game)){
+	out = processCommand(game, command, command_index);
+	if(game_status == Solve && isWin(out)){
 		changeToInit();
 		printf("The board is solved! Good job! :)\n");
 		printf("Game was set to Init mode\n");
 	}
-	return processCommand(game, command, command_index);
+	return out;
 }
 

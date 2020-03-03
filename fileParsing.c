@@ -70,18 +70,18 @@ Game* readFromFile(char* fileDir, int check_errors){
 	buffer = (char*)malloc(file_size);
 	if(buffer == NULL){
 		printf("ERROR: problem with memory allocation\n");
+		fclose(fptr);
 		exit(0);
-		return NULL;
 	}
 	fread (buffer, 1, file_size, fptr);
 	token = strtok(buffer, delim);
 	if(checkMN(token) == 0){
-		return NULL;
+		goto free;
 	}
 	num_of_rows_in_block = converStringToInt(token);
 	token = strtok(NULL, delim);
 	if(checkMN(token) == 0){
-			return NULL;
+		goto free;
 	}
 	num_of_columns_in_block = converStringToInt(token);
 	board_size = num_of_columns_in_block * num_of_rows_in_block;
@@ -115,7 +115,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	    	  goto free;
 	      }
 	      token = strtok(NULL, delim);
-	      	    if(token == NULL && (x != board_size || y != board_size)){
+	      if(token == NULL && (x != board_size || y != board_size)){
 	      	    	  goto free;
 	      }
 	      if(x == board_size){
@@ -172,10 +172,10 @@ void saveToFile(Game *game, char* fileDir){
 		}
 		fixCellsWithValues(game);
 	}
-	sprintf(converted, "%d", game->num_of_columns_in_block);
+	sprintf(converted, "%d", game->num_of_rows_in_block);
 	fprintf(fptr, "%s", converted);
 	fprintf(fptr, " ");
-	sprintf(converted, "%d", game->num_of_rows_in_block);
+	sprintf(converted, "%d", game->num_of_columns_in_block);
 	fprintf(fptr,"%s", converted);
 	fprintf(fptr, "\n");
 	for(i=1;i<=game->board_size;i++){

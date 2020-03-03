@@ -527,6 +527,7 @@ Game* solve(Game *cur_game, char* fileName){
 	game = readFromFile(fileName, 1);
 	if(game != NULL){
 		markInvalidCells(game);
+		game_status = Solve;
 		if(cur_game != NULL){
 			freeGame(cur_game);
 		}
