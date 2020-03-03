@@ -395,7 +395,6 @@ int optimizeTheModel(){
 		printf(ERRORMAL);
 		exit(0);
 	}
-	printf("sol is exsist\n");
 	error = GRBoptimize(model);
 	if (error) {
 		return 0;
@@ -570,7 +569,7 @@ void printGuessHint(Game *game, int row, int column){
 	for(value=1;value<=game->board_size;value++){
 		place=findPlaceForOption(row,column,value);
 		if(place!=-1 && sol[place]>0){
-			printf("value-%d has %f percent chance to fit in this cell\n",value,sol[place]);
+			printf("value %d has %f percent chance to fit in this cell\n",value,sol[place]);
 			count++;
 		}
 	}

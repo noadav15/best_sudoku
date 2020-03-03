@@ -142,7 +142,7 @@ void hint(Game *game, int row,int column){
 
 	if(value==1){
 		int value = getHint(row,column,game);
-		printf("Hint- set cell<%d,%d> to %d.\n",column,row,value);
+		printf("Hint- set cell <%d,%d> to %d.\n",column,row,value);
 	}
 	if(value==0 || value==2){
 		printf("no solution found- board is not solvable, can not present a hint\n");
