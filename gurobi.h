@@ -52,6 +52,8 @@ void fillAllGuesses(Game *game,float X);
 void printGuessHint(Game *game, int row, int column);
 
 /* Free model and environment */
-void freeGR();
+void freeGR(int sol);
+
+void freelbub();
 
 #endif /* GUROBI_H_ */

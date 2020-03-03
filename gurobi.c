@@ -395,6 +395,7 @@ int optimizeTheModel(){
 		printf(ERRORMAL);
 		exit(0);
 	}
+	printf("sol is exsist\n");
 	error = GRBoptimize(model);
 	if (error) {
 		return 0;
@@ -577,17 +578,23 @@ void printGuessHint(Game *game, int row, int column){
 		printf("there are no guesses with a positive chance\n");
 	}
 }
-
-/* Free model and environment */
-void freeGR(){
-	free(sol);
-	free(obj);
+void freelbub(){
 	free(ub);
 	free(lb);
+}
+
+/* Free model and environment */
+void freeGR(int sol_free){
+
+	if(sol_free){
+		free(sol);
+	}
+	free(obj);
 	free(vtype);
 	free(obj_value);
 	GRBfreemodel(model);
 	GRBfreeenv(env);
+
 
 }
 

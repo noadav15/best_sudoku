@@ -22,10 +22,11 @@ int callGurobi(Game *game, int ILP){
 		return -1;
 	}
 	if(value==-1){
-		return 0;
+		return 2;
 	}
 	if(!createBounds()){
 		return -1;
+
 	}
 	if(!createEmptyModel()){
 		return -1;
@@ -33,7 +34,6 @@ int callGurobi(Game *game, int ILP){
 	if(!sendToModel()){
 		return -1;
 	}
-
 	if(!setCellConstraints(game)){
 		return -1;
 	}
@@ -103,13 +103,19 @@ void validate(Game *game){
 	if(value==1){
 		printf("solution found- board solvable\n");
 	}
-	if(value==0){
+	if(value==0 || value==2){
 		printf("no solution found- board is not solvable\n");
 	}
 	if(value==-1){
 		printf("ERROR: a problem has accrued with Gurobi\n");
 	}
-	freeGR();
+	if(value==2){
+		freeGR(0);
+	}
+	else{
+		freeGR(1);
+	}
+
 }
 
 /*receives cell index and finds a hint for it if exists*/
@@ -138,13 +144,18 @@ void hint(Game *game, int row,int column){
 		int value = getHint(row,column,game);
 		printf("Hint- set cell<%d,%d> to %d.\n",column,row,value);
 	}
-	if(value==0){
+	if(value==0 || value==2){
 		printf("no solution found- board is not solvable, can not present a hint\n");
 	}
 	if(value==-1){
 		printf("ERROR: a problem has accrued with Gurobi\n");
 	}
-	freeGR();
+	if(value==2){
+		freeGR(0);
+	}
+	else{
+		freeGR(1);
+	}
 }
 
 /*receives a threshold value and fills the game board with guesses with higher probability than the threshold*/
@@ -158,17 +169,26 @@ int guess(Game *game, float X){
 	value = callGurobi(game,0);
 	if(value==1){
 		fillAllGuesses(game,X);
-		freeGR();
+		freelbub();
+		freeGR(1);
 		return 1;
 	}
-	if(value==0){
+	if(value==0 || value==2){
 		printf("no solution found- board is not solvable\n");
-		freeGR();
+
+		if(value==2){
+			freeGR(0);
+		}
+		else{
+			freelbub();
+			freeGR(1);
+		}
 		return 0;
 	}
 	if(value==-1){
 		printf("ERROR: a problem has accrued with Gurobi\n");
-		freeGR();
+		freelbub();
+		freeGR(1);
 		return 0;
 	}
 	return 0;
@@ -197,15 +217,23 @@ void guessHint(Game *game, int row, int column){
 	value = callGurobi(game,0);
 	if(value==1){
 		printGuessHint(game, row,column);
-		freeGR();
+		freelbub();
+		freeGR(1);
 	}
-	if(value==0){
+	if(value==0 ||value==2){
 		printf("no solution found- board is not solvable, can not present a hint\n");
-		freeGR();
+		if(value==2){
+			freeGR(0);
+		}
+		else{
+			freelbub();
+			freeGR(1);
+		}
 	}
 	if(value==-1){
 		printf("ERROR: a problem has accrued with Gurobi\n");
-		freeGR();
+		freelbub();
+		freeGR(1);
 
 	}
 }
@@ -331,10 +359,16 @@ int generate(Game *game, int X,int Y){
 				}
 				freeGame(copy_game);
 				freeGame(game_sol);
-				freeGR();
+				freeGR(1);
 				return 1;
 			}
-			freeGR();
+			if(value==2){
+				freeGR(0);
+			}
+			else{
+				freelbub();
+				freeGR(1);
+			}
 		}
 		freeGame(copy_game);
 	}
