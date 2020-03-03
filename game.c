@@ -56,6 +56,7 @@ void printBlockRow(int i, Game *game){
 /*prints the game board*/
 void printBoard(Game *game){
 	int k;
+	printf("num_column=%d\n",game->num_of_columns_in_block);
 	for(k=0;k<game->num_of_columns_in_block;k++){
 		printBlockRow(k*game->num_of_rows_in_block +1, game);
 	}
@@ -571,6 +572,17 @@ int numberOfEmptyCell(Game *game){
 		}
 	}
 	return count;
+}
+
+/*returns 1 if the the game board solve successfully and 0 otherwise*/
+int isWin(Game *game){
+	int valid,number;
+	valid=boardValueAreValid(game);
+	number=numberOfEmptyCell(game);
+	if(valid==1 && number==0){
+		return 1;
+	}
+	return 0;
 }
 
 

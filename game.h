@@ -81,4 +81,7 @@ void copyGame(Game *game, Game *copy_game);
  * returns 1 if true and 0 otherwise*/
 int oneValidOption(int *arr,Game *game);
 
+/*returns 1 if the the game board solve successfully and 0 otherwise*/
+int isWin(Game *game);
+
 #endif /* GAME_H_ */
