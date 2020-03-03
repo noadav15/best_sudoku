@@ -25,6 +25,7 @@ int checkFormatFixed(char* token){
 	char check[1024];
 	if(strlen(token) >= 2){
 				strncpy(check, token, strlen(token) - 1);
+				check[strlen(token) - 1] = '\0';
 				if(checkIfStringIsInt(check) && token[strlen(token) - 1] == '.'){
 						return 1;
 				}
@@ -88,7 +89,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	game = initializeGame(num_of_rows_in_block, num_of_columns_in_block);
 	token = strtok(NULL, delim);
 	while( token != NULL ) {
-	      if(checkFormatNotFixed(token)){
+		if(checkFormatNotFixed(token)){
 	    	  converted_value = converStringToInt(token);
 	    	  if(converted_value >= 0 && converted_value <= board_size){
 				  (game->board)[y][x].value = converted_value;
