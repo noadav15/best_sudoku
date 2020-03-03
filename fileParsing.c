@@ -78,12 +78,12 @@ Game* readFromFile(char* fileDir, int check_errors){
 	if(checkMN(token) == 0){
 		return NULL;
 	}
-	num_of_columns_in_block = converStringToInt(token);
+	num_of_rows_in_block = converStringToInt(token);
 	token = strtok(NULL, delim);
 	if(checkMN(token) == 0){
 			return NULL;
 	}
-	num_of_rows_in_block = converStringToInt(token);
+	num_of_columns_in_block = converStringToInt(token);
 	board_size = num_of_columns_in_block * num_of_rows_in_block;
 	game = initializeGame(num_of_rows_in_block, num_of_columns_in_block);
 	token = strtok(NULL, delim);
@@ -194,6 +194,7 @@ void saveToFile(Game *game, char* fileDir){
 				}
 			}
 	}
+	printf("Board saved to: %s\n", fileDir);
 	fclose(fptr);
 }
 

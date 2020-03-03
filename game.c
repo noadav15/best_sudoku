@@ -229,10 +229,6 @@ int boardValueAreValid(Game *game){
 int setCell(int x, int y, int z, Game *game, int start){
 	Cell cur_cell;
 	int max_value;
-	if(game_status == Init){
-			printf("Error: Set isn't available in Init mode\n");
-			return 0;
-	}
 	max_value = game->num_of_columns_in_block*game->num_of_rows_in_block;
 	if(y > game->board_size || y < 1){
 		printf("Error: column number is incorrect - out of range\n");
