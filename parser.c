@@ -351,7 +351,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 					printf("ERROR: not enough parameters for guess, please enter 1 parameter\n");
 					return game;
 			}
-			if(checkIfStringIsFloat(command[1])){
+			if(checkIfStringIsFloat(command[1]) || !strcmp(command[1], "1") || !strcmp(command[1], "0")){
 					converted_float = convertStringToFloat(command[1]);
 					if(converted_float >= 0 && converted_float <= 1){
 							if(guess(game, convertStringToFloat(command[1]))){
