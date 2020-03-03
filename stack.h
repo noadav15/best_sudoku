@@ -1,3 +1,4 @@
+/*This module implements a stack.*/
 /*Stack struct*/
 
 #ifndef STACK_H_
@@ -24,14 +25,22 @@ typedef struct StackNode {
 	struct StackNode *next;
 } StackNode;
 
-
+/*creates an empty stack*/
 Stack *stackCreate();
+
+/*frees the stack and all the memory related to it*/
 void stackDestroy(Stack *stack);
-void stackClean(Stack *stack);
-bool stackIsEmpty(Stack *stack);
-size_t stackSize(Stack *stack);
+
+/*returns stack size*/
+int stackSize(Stack *stack);
+
+/*returns top element*/
 StackNode *stackTop(Stack *stack);
+
+/*pushes an element to the stack*/
 bool stackPush(Stack *stack, int i, int j, int *arr_of_options);
+
+/*pops an element from the stack*/
 StackNode *stackPop(Stack *stack);
 
 #endif

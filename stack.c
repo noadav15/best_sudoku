@@ -8,7 +8,7 @@
 
 
 struct Stack {
-	size_t count;
+	int count;
 	StackNode *top;
 };
 
@@ -25,14 +25,6 @@ Stack *stackCreate()
 
 	return stack;
 }
-
-/*frees the stack and all the memory related to it*/
-void stackDestroy(Stack *stack)
-{
-	stackClean(stack);
-	free(stack);
-}
-
 /*helper function for stackDestroy*/
 void stackClean(Stack *stack){
 
@@ -43,12 +35,20 @@ void stackClean(Stack *stack){
 		free(node);
 	}
 }
+/*frees the stack and all the memory related to it*/
+void stackDestroy(Stack *stack)
+{
+	stackClean(stack);
+	free(stack);
+}
 
-size_t stackSize(Stack *stack)
+/*returns stack size*/
+int stackSize(Stack *stack)
 {
 	return stack->count;
 }
 
+/*returns top element*/
 StackNode *stackTop(Stack *stack)
 {
 	return stack->top;

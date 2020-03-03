@@ -17,8 +17,12 @@ int callGurobi(Game *game, int ILP){
 	if(!noMessages()){
 		return -1;
 	}
-	if(!createObjAndSendToModel(game,ILP)){
+	value=createObjAndSendToModel(game,ILP);
+	if(value==0){
 		return -1;
+	}
+	if(value==-1){
+		return 0;
 	}
 	if(!createBounds()){
 		return -1;
@@ -45,13 +49,48 @@ int callGurobi(Game *game, int ILP){
 	if(!optimizeTheModel()){
 		return -1;
 	}
-	if(!getSol()){
-		return -1;
-	}
-	value=end();
+	value=getSol();
 	return value;
 }
-
+/*fill all cells which have only one possible value.
+ * returns 1 if autofill was successful and 0 otherwise */
+int fillPossibleCells(Game *game){
+	int i=1, j=1, value,start=1;
+	Game *copy_game;
+	int *arr_of_options;
+	if(!boardValueAreValid(game)){
+		printf("ERROR: the board is erroneous\n");
+		return 0;
+	}
+	copy_game = (Game*)malloc(sizeof(Game));
+	if(copy_game==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
+	copyGame(game,copy_game);
+	for(i=1;i<=game->board_size;i++){
+		for(j=1;j<=game->board_size;j++){
+			if(copy_game->board[i][j].value==0){
+				arr_of_options=(int*) calloc(game->board_size+1, sizeof(int));
+				if(arr_of_options==NULL){
+					printf("ERROR: problem with memory allocation\n");
+					exit(0);
+				}
+				fillArrWithOption(arr_of_options,copy_game,i,j);
+				if(stillHasOptionForCell(arr_of_options,copy_game)){
+					value= oneValidOption(arr_of_options,copy_game);
+					if(value!=0){
+						setCell(j,i,value,game,start);
+						start=0;
+					}
+				}
+				free(arr_of_options);
+			}
+		}
+	}
+	freeGame(copy_game);
+	return 1;
+}
 /*checks whether the board is solvable using gurobi ILP*/
 void validate(Game *game){
 	int value=0,valid;
@@ -92,19 +131,19 @@ void hint(Game *game, int row,int column){
 		printf("Hint- set cell<%d,%d> to %d.\n",column,row,value);
 	}
 	if(value==0){
-		printf("no solution found- board is unsolvable\n");
+		printf("no solution found- board is not solvable, can not present a hint\n");
 	}
 	if(value==-1){
-		printf("problem accrued in gurobi\n");
+		printf("ERROR: a problem has accrued with Gurobi\n");
 	}
 	freeGR();
 }
 
-/*receives a threshold value and fills the game board with guesses with higher probebility than the threshold*/
+/*receives a threshold value and fills the game board with guesses with higher probability than the threshold*/
 int guess(Game *game, float X){
 	int value=0,valid;
 
-	valid= autoFillBoard(game);
+	valid= fillPossibleCells(game);
 	if(valid==0){
 		printf("the board is erroneous\n");
 		return 0;
@@ -116,12 +155,12 @@ int guess(Game *game, float X){
 		return 1;
 	}
 	if(value==0){
-		printf("no solution found- board is unsolvable\n");
+		printf("no solution found- board is not solvable\n");
 		freeGR();
 		return 0;
 	}
 	if(value==-1){
-		printf("problem accrued in gurobi\n");
+		printf("ERROR: a problem has accrued with Gurobi\n");
 		freeGR();
 		return 0;
 	}
@@ -146,11 +185,11 @@ void guessHint(Game *game, int row, int column){
 		freeGR();
 	}
 	if(value==0){
-		printf("no solution found- board is unsolvable\n");
+		printf("no solution found- board is not solvable, can not present a hint\n");
 		freeGR();
 	}
 	if(value==-1){
-		printf("problem accrued in gurobi\n");
+		printf("ERROR: a problem has accrued with Gurobi\n");
 		freeGR();
 
 	}
@@ -259,7 +298,7 @@ int generate(Game *game, int X,int Y){
 				emptyYCells(game_sol,Y);
 				for(j=1;j<=game->board_size;j++){
 					for(k=1;k<=game->board_size;k++){
-						setCell(j,k,game_sol->board[j][k].value,game,first);
+						setCell(k,j,game_sol->board[j][k].value,game,first);
 						first=0;
 					}
 				}

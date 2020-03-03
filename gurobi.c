@@ -1,4 +1,4 @@
-
+/*this module includes all functions that create gurobi env and use array belongs to gurobi model*/
 #define ERRORMAL "ERROR: problem with memory allocation\n"
 #define ERRORGUR "Error: Gurobi optimizer has failed\n"
 #include <stdlib.h>
@@ -26,11 +26,9 @@ Option    *obj_value;
 char      *vtype;
 int       optimstatus;
 double    objval;
-
 int number_of_varibals=0;
-/*
- * creates a gurobi environment.
- */
+
+/*creates a gurobi environment. */
 int createEnv(){
 	int error;
 	error = GRBloadenv(&env, NULL);
@@ -42,9 +40,9 @@ int createEnv(){
 
 /*gurobi wont print messages*/
 int noMessages(){
+	int error;
 	error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
 	if (error) {
-		/*printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -53,9 +51,9 @@ int noMessages(){
 
 /* Create an empty model named "mip1" */
 int createEmptyModel(){
+	int error;
 	error = GRBnewmodel(env, &model, "mip1", number_of_varibals, obj, lb, ub, vtype, NULL);
 	if (error) {
-		/*printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -84,30 +82,35 @@ void fillObjValue(Game *game){
 
 /*fills the object array*/
 int createObjAndSendToModel(Game *game, int ILP){
-	int count=0,i,j,value,invalid=0;
+	int count=0,i,j,value,invalid=0, there_is_valid_option=0;
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			if(game->board[i][j].value==0){
+				there_is_valid_option=0;
 				for(value=1;value<=game->board_size;value++){
 					game->board[i][j].value=value;
 					invalid=invalidCell(game,i,j,0);
 					if(invalid==0){
 						count++;
+						there_is_valid_option=1;
 					}
 					game->board[i][j].value=0;
+				}
+				if(there_is_valid_option==0){
+					return -1;
 				}
 			}
 		}
 	}
 	number_of_varibals=count;
-	obj_value= (Option*)malloc(count*sizeof(Option));
+	obj_value= (Option*)malloc(number_of_varibals*sizeof(Option));
 	fillObjValue(game);
-	obj=(double*)calloc(count,sizeof(double));
+	obj=(double*)calloc(number_of_varibals,sizeof(double));
 	if(obj==NULL){
 		printf(ERRORMAL);
 		return 0;
 	}
-	vtype=(char*)calloc(count,sizeof(char));
+	vtype=(char*)calloc(number_of_varibals,sizeof(char));
 	if(vtype==NULL){
 		printf(ERRORMAL);
 		return 0;
@@ -127,23 +130,20 @@ int createObjAndSendToModel(Game *game, int ILP){
 
 /*sends the arrays to the model*/
 int sendToModel(){
-
+	int error;
 	/* add variables to model */
 	error = GRBaddvars(model, number_of_varibals, 0, NULL, NULL, NULL, obj, lb, ub, vtype, NULL);
 	if (error) {
-		/*printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	/* Change objective sense to maximization */
 	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MINIMIZE);
 	if (error) {
-		/*printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	/* update the model - to integrate new variables */
 	error = GRBupdatemodel(model);
 	if (error) {
-		/*printf("ERROR %d GRBupdatemodel(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -162,6 +162,7 @@ int findPlaceForOption(int i,int j,int value){
 
 /*sets cell constraints (every cell should be filled with exactly one value)*/
 int setCellConstraints(Game *game){
+	int error;
 	int i,j,place,value,current_k=0;
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
@@ -195,7 +196,6 @@ int setCellConstraints(Game *game){
 				/*add constrain to mode*/
 				error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 				if (error) {
-				/*	printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 					free(ind);
 					free(val);
 					return 0;
@@ -211,6 +211,7 @@ int setCellConstraints(Game *game){
 
 /*sets row constraints*/
 int setRowConstraints(Game *game){
+	int error;
 	int i,j,place,value,current_k=0;
 	for(i=1;i<=game->board_size;i++){
 		for(value=1;value<=game->board_size;value++){
@@ -245,7 +246,6 @@ int setRowConstraints(Game *game){
 				/*add constrain to mode*/
 				error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 				if (error) {
-					/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 					free(ind);
 					free(val);
 
@@ -261,6 +261,7 @@ int setRowConstraints(Game *game){
 
 /*sets column constraints*/
 int setColumnConstraints(Game *game){
+	int error;
 	int i,j,place,value,current_k=0;
 	for(i=1;i<=game->board_size;i++){
 		for(value=1;value<=game->board_size;value++){
@@ -294,7 +295,6 @@ int setColumnConstraints(Game *game){
 				/*add constrain to mode*/
 				error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 				if (error) {
-					/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 					free(ind);
 					free(val);
 					return 0;
@@ -309,6 +309,7 @@ int setColumnConstraints(Game *game){
 
 /*sets block constraints*/
 int setBlockConstraints(Game *game){
+	int error;
 	int i,j,place,value,current_k=0,row,column;
 	/*for each block*/
 	for(i=1;i<=game->board_size;i=i+game->num_of_columns_in_block){
@@ -352,7 +353,6 @@ int setBlockConstraints(Game *game){
 					/*add constrain to mode*/
 					error = GRBaddconstr(model, current_k, ind, val, GRB_EQUAL, 1, NULL);
 					if (error) {
-						/*printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));*/
 						free(ind);
 						free(val);
 						return 0;
@@ -387,9 +387,9 @@ int createBounds(){
 }
 
 
-
 /* Optimize model - need to call this before calculation */
 int optimizeTheModel(){
+	int error;
 	sol = (double*)calloc(number_of_varibals,sizeof(double));
 	if(sol==NULL){
 		printf(ERRORMAL);
@@ -397,13 +397,11 @@ int optimizeTheModel(){
 	}
 	error = GRBoptimize(model);
 	if (error) {
-		/*printf("ERROR %d GRBoptimize(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	/* Write model to 'mip1.lp' - this is not necessary but very helpful */
 	error = GRBwrite(model, "mip1.lp");
 	if (error) {
-		/*printf("ERROR %d GRBwrite(): %s\n", error, GRBgeterrormsg(env));*/
 		return 0;
 	}
 	return 1;
@@ -411,45 +409,23 @@ int optimizeTheModel(){
 
 /*gests the solution*/
 int getSol(){
+	int error;
 	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
 	if (error) {
-		/*printf("ERROR %d GRBgetintattr(): %s\n", error, GRBgeterrormsg(env));*/
+		printf("ERROR %d GRBgetintattr(): %s\n", error, GRBgeterrormsg(env));
+		return -1;
+	}
+	/*no solution*/
+	if (optimstatus != GRB_OPTIMAL) {
 		return 0;
 	}
-
-	/* get the objective -- the optimal result of the function */
-	error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
-	if (error) {
-		/*printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));*/
-		return 0;
-	}
-
 	/* get the solution - the assignment to each variable */
 	error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, number_of_varibals, sol);
 	if (error) {
-		/*printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));*/
-		return 0;
+		return -1;
 	}
 	return 1;
 }
-
-/*return 1-solution, 0 no solution, -1 problem in gurobi*/
-int end(){
-	/* solution found */
-	if (optimstatus == GRB_OPTIMAL) {
-		return 1;
-	}
-	/* no solution found */
-	else if (optimstatus == GRB_INF_OR_UNBD) {
-		return 0;
-	}
-	/* error or calculation stopped */
-	else {
-		return -1;
-	}
-	return 0;
-}
-
 
 /* Gets solution information */
 Game *findHintBoard(Game *game){
@@ -567,9 +543,7 @@ Game *findGuessBoard(Game *game,float X){
 void fillAllGuesses(Game *game,float X){
 	Game *game_sol;
 	int i,j;
-	/*for(i=0;i<100;i++){
-		printf("row=%d, column=%d, value=%d, index=%d, sol=%f\n", obj_value[i].row,obj_value[i].column,obj_value[i].value,i,sol[i]);
-	}*/
+
 	game_sol=findGuessBoard(game,X);
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
@@ -598,10 +572,9 @@ void printGuessHint(Game *game, int row, int column){
 	if(count==0){
 		printf("there are no guesses with a positive chance\n");
 	}
-
-
 }
-/* IMPORTANT !!! - Free model and environment */
+
+/* Free model and environment */
 void freeGR(){
 	free(sol);
 	free(obj);

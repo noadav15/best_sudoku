@@ -1,5 +1,5 @@
 /*This module is responsible for the functions related to the MoveHistory doubly linked list.
- *Each list node represnts a move and stores all the related information to it.*/
+ *Each list node represents a move and stores all the related information to it.*/
 
 #ifndef LINKEDLIST_H_
 #define LINKEDLIST_H_

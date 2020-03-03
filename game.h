@@ -71,7 +71,14 @@ Game* initializeGame(int num_of_rows_in_block, int num_of_columns_in_block);
 /*checks whether a cell is valid and returns 1 or 0 otherwise*/
 int invalidCell(Game *game, int row , int column, int ignore_not_fixed);
 
+/*returns the number of empty cells in the board*/
 int numberOfEmptyCell(Game *game);
 
+/*copies one game to another*/
 void copyGame(Game *game, Game *copy_game);
+
+/*check if the input array has only one valid option,
+ * returns 1 if true and 0 otherwise*/
+int oneValidOption(int *arr,Game *game);
+
 #endif /* GAME_H_ */
