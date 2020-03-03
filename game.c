@@ -80,6 +80,10 @@ void initializeEmptyBoard(Game *game){
 	}
 	for(i=1;i<=game->board_size;i++){
 		game->board[i]=(Cell*)malloc((game->board_size+1)*sizeof(Cell));
+		if(game->board[i] == NULL){
+			printf("ERROR: problem with memory allocation\n");
+			exit(0);
+		}
 		if(game->board[i]==NULL){
 			printf("ERROR: problem with memory allocation\n");
 			exit(0);
