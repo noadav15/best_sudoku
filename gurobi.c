@@ -104,16 +104,20 @@ int createObjAndSendToModel(Game *game, int ILP){
 	}
 	number_of_varibals=count;
 	obj_value= (Option*)malloc(number_of_varibals*sizeof(Option));
+	if(obj_value==NULL){
+		printf(ERRORMAL);
+		exit(0);
+	}
 	fillObjValue(game);
 	obj=(double*)calloc(number_of_varibals,sizeof(double));
 	if(obj==NULL){
 		printf(ERRORMAL);
-		return 0;
+		exit(0);
 	}
 	vtype=(char*)calloc(number_of_varibals,sizeof(char));
 	if(vtype==NULL){
 		printf(ERRORMAL);
-		return 0;
+		exit(0);
 	}
 	/*put random coefficients for variables and  variable types to vtype arr*/
 	for(i=0;i<count;i++){
@@ -177,12 +181,12 @@ int setCellConstraints(Game *game){
 				ind = (int*)calloc(current_k,sizeof(int));
 				if(ind==NULL){
 					printf(ERRORMAL);
-					return 0;
+					exit(0);
 				}
 				val = (double*)calloc(current_k,sizeof(double));
 				if(val==NULL){
 					printf(ERRORMAL);
-					return 0;
+					exit(0);
 				}
 				current_k=0;
 				for(value=1;value<=game->board_size;value++){
@@ -226,13 +230,12 @@ int setRowConstraints(Game *game){
 				ind = (int*)calloc(current_k,sizeof(int));
 				if(ind==NULL){
 					printf(ERRORMAL);
-					return 0;
+					exit(0);
 				}
 				val = (double*)calloc(current_k,sizeof(double));
-
 				if(val==NULL){
 					printf(ERRORMAL);
-					return 0;
+					exit(0);
 				}
 				current_k=0;
 				for(j=1;j<=game->board_size;j++){
@@ -276,12 +279,12 @@ int setColumnConstraints(Game *game){
 				ind = (int*)calloc(current_k,sizeof(int));
 				if(ind==NULL){
 					printf(ERRORMAL);
-					return 0;
+					exit(0);
 				}
 				val = (double*)calloc(current_k,sizeof(double));
 				if(val==NULL){
 					printf(ERRORMAL);
-					return 0;
+					exit(0);
 				}
 				current_k=0;
 				for(j=1;j<=game->board_size;j++){
@@ -326,18 +329,15 @@ int setBlockConstraints(Game *game){
 					}
 				}
 				if(current_k>0){
-
 					ind = (int*)calloc(current_k,sizeof(int));
-
 					if(ind==NULL){
 						printf(ERRORMAL);
-						return 0;
+						exit(0);
 					}
 					val = (double*)calloc(current_k,sizeof(double));
-
 					if(val==NULL){
 						printf(ERRORMAL);
-						return 0;
+						exit(0);
 					}
 					current_k=0;
 					for(row=j;row<j+game->num_of_rows_in_block;row++){
@@ -373,11 +373,11 @@ int createBounds(){
 	ub=(double*)malloc(number_of_varibals*sizeof(double));
 	if(ub==NULL){
 		printf(ERRORMAL);
-		return 0;
+		exit(0);
 	}
 	if(lb==NULL){
 		printf(ERRORMAL);
-		return 0;
+		exit(0);
 	}
 	for(i=0;i<number_of_varibals;i++){
 		lb[i]=0.0;
@@ -393,7 +393,7 @@ int optimizeTheModel(){
 	sol = (double*)calloc(number_of_varibals,sizeof(double));
 	if(sol==NULL){
 		printf(ERRORMAL);
-		return 0;
+		exit(0);
 	}
 	error = GRBoptimize(model);
 	if (error) {
@@ -468,7 +468,10 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 	float precent;
 	float *arr_of_option_without_precent= (float*)calloc(game_sol->board_size+1,sizeof(float));
 	int *arr_of_option_precent;
-
+	if(arr_of_option_without_precent==NULL){
+			printf(ERRORMAL);
+			exit(0);
+		}
 	for(value=1;value<=game_sol->board_size;value++){
 		place=findPlaceForOption(i,j,value);
 		precent=sol[place];
@@ -491,6 +494,10 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 	}
 	if(num_possible>0){
 		arr_of_option_precent=(int*)calloc(num_possible,sizeof(int));
+		if(arr_of_option_precent==NULL){
+					printf(ERRORMAL);
+					exit(0);
+				}
 		for(value=1;value<=game_sol->board_size;value++){
 			if(arr_of_option_without_precent[value]>0){
 				place=findPlaceForOption(i,j,value);
@@ -558,9 +565,6 @@ void fillAllGuesses(Game *game,float X){
 /*prints the guesses corresponding to the received index*/
 void printGuessHint(Game *game, int row, int column){
 	int value,place,count;
-	/*for(i=0;i<number_of_varibals;i++){
-		printf("row=%d, column=%d, value=%d, index=%d, sol=%f\n", obj_value[i].row,obj_value[i].column,obj_value[i].value,i,sol[i]);
-	}*/
 	printf("guess hint cell<%d,%d>:\n",column,row);
 	for(value=1;value<=game->board_size;value++){
 		place=findPlaceForOption(row,column,value);

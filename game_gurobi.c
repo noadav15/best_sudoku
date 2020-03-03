@@ -53,7 +53,7 @@ int callGurobi(Game *game, int ILP){
 	return value;
 }
 /*fill all cells which have only one possible value.
- * returns 1 if autofill was successful and 0 otherwise */
+ * returns 1 if put any valid option and 0 otherwise */
 int fillPossibleCells(Game *game){
 	int i=1, j=1, value,start=1;
 	Game *copy_game;
@@ -115,6 +115,14 @@ void validate(Game *game){
 /*receives cell index and finds a hint for it if exists*/
 void hint(Game *game, int row,int column){
 	int value=0,valid;
+	if(column<0 || column>game->board_size){
+		printf("first parameter not in range, should be between 1 and %d\n",game->board_size);
+		return;
+	}
+	if(row<0 || row>game->board_size){
+		printf("Second parameter not in range, should be between 1 and %d\n",game->board_size);
+		return;
+	}
 	valid=boardValueAreValid(game);
 	if(valid==0){
 		printf("the board is erroneous\n");
@@ -142,7 +150,6 @@ void hint(Game *game, int row,int column){
 /*receives a threshold value and fills the game board with guesses with higher probability than the threshold*/
 int guess(Game *game, float X){
 	int value=0,valid;
-
 	valid= fillPossibleCells(game);
 	if(valid==0){
 		printf("the board is erroneous\n");
@@ -170,6 +177,14 @@ int guess(Game *game, float X){
 /*receives a cell index and finds all possible valid values for it with probability higher than 0 for a solution*/
 void guessHint(Game *game, int row, int column){
 	int value=0,valid;
+	if(column<0 || column>game->board_size){
+		printf("first parameter not in range, should be between 1 and %d\n",game->board_size);
+		return;
+	}
+	if(row<0 || row>game->board_size){
+		printf("Second parameter not in range, should be between 1 and %d\n",game->board_size);
+		return;
+	}
 	valid=boardValueAreValid(game);
 	if(valid==0){
 		printf("the board is erroneous\n");
@@ -199,6 +214,10 @@ void guessHint(Game *game, int row, int column){
 int *randomCell(Game *copy_game){
 	int row, column;
 	int *result=(int*)malloc(2*sizeof(int));
+	if(result==NULL){
+		printf("ERROR: problem with memory allocation\n");
+		exit(0);
+	}
 	row=(rand()%copy_game->board_size)+1;
 	column=(rand()%copy_game->board_size)+1;
 	while(copy_game->board[row][column].value!=0){
@@ -232,6 +251,10 @@ int fillXCells(Game *copy_game, int X){
 	int *arr_of_option;
 	for(count_X=1;count_X<=X ;count_X++){
 		arr_of_option= (int*)calloc(copy_game->board_size+1,sizeof(int));
+		if(arr_of_option==NULL){
+			printf("ERROR: problem with memory allocation\n");
+			exit(0);
+		}
 		indexes = randomCell(copy_game);
 		fillArrWithOption(arr_of_option,copy_game,indexes[0],indexes[1]);
 		if(stillHasOptionForCell(arr_of_option,copy_game)){
@@ -275,9 +298,9 @@ int generate(Game *game, int X,int Y){
 		return 0;
 	}
 	if(Y<=0 || Y>(game->board_size*game->board_size)){
-			printf("Second parameter not in range, should be between 0 and %d\n",(game->board_size*game->board_size));
-			return 0;
-		}
+		printf("Second parameter not in range, should be between 0 and %d\n",(game->board_size*game->board_size));
+		return 0;
+	}
 	valid=boardValueAreValid(game);
 	if(valid==0){
 		printf("the board is erroneous\n");
@@ -286,6 +309,10 @@ int generate(Game *game, int X,int Y){
 
 	for(i=0;i<1000;i++){
 		copy_game =(Game*)malloc(sizeof(Game));
+		if(copy_game==NULL){
+			printf("ERROR: problem with memory allocation\n");
+			exit(0);
+		}
 		copyGame(game,copy_game);
 		/*fill X cells*/
 		valid= fillXCells(copy_game,X);
