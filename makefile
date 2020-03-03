@@ -1,6 +1,6 @@
 CC = gcc
 OBJS = main.o game.o solve.o stack.o linkedList.o fileParsing.o gurobi.o game_gurobi.o parser.o
-EXEC = sudoku
+EXEC = sudoku-console
 COMP_FLAG = -ansi -Wall -Wextra -Werror -pedantic-errors
 GUROBI_COMP = -I/usr/local/lib/gurobi563/include
 GUROBI_LIB = -L/usr/local/lib/gurobi563/lib -lgurobi56
@@ -26,7 +26,6 @@ game_gurobi.o: game_gurobi.c game_gurobi.h
 	$(CC) $(COMP_FLAG) $(GUROBI_LIB) -c $*.c
 parser.o: parser.c parser.h
 	$(CC) $(COMP_FLAG) $(GUROBI_LIB) -c $*.c
-
 
 clean:
 	rm -f $(OBJS) $(EXEC)

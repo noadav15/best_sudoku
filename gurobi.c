@@ -140,7 +140,7 @@ int sendToModel(){
 	if (error) {
 		return 0;
 	}
-	/* Change objective sense to maximization */
+	/* Change objective sense to minimization */
 	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MINIMIZE);
 	if (error) {
 		return 0;
