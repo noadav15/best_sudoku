@@ -504,7 +504,7 @@ int checkFixedCells(Game *game){
 
 /*imports a game from a file in Edit mode, if the file name provided is an empty string,
  * initializes a new game with 3x3 blocks board.*/
-Game* edit(char* fileName){
+Game* edit(Game *cur_game, char* fileName){
 	Game *game;
 	if(strcmp(fileName, "") == 0){
 		game_status = Edit;
@@ -514,16 +514,22 @@ Game* edit(char* fileName){
 	if(game != NULL){
 		markInvalidCells(game);
 		game_status = Edit;
+		if(cur_game != NULL){
+			freeGame(cur_game);
+		}
 	}
 	return game;
 }
 
 /*imports a game from a file in Solve mode.*/
-Game* solve(char* fileName){
+Game* solve(Game *cur_game, char* fileName){
 	Game *game;
 	game = readFromFile(fileName, 1);
 	if(game != NULL){
 		markInvalidCells(game);
+		if(cur_game != NULL){
+			freeGame(cur_game);
+		}
 	}
 	return game;
 }
@@ -569,7 +575,7 @@ int numberOfEmptyCell(Game *game){
 	return count;
 }
 
-/*returns 1 if the the game board solve successfully and 0 otherwise*/
+/*returns 1 if game board is solved and 0 otherwise*/
 int isWin(Game *game){
 	int valid,number;
 	valid=boardValueAreValid(game);
@@ -580,4 +586,8 @@ int isWin(Game *game){
 	return 0;
 }
 
+/*changes the game mode to Init*/
+void changeToInit(){
+	game_status = Init;
+}
 

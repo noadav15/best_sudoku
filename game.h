@@ -51,11 +51,11 @@ int checkFixedCells(Game *game);
 void fixCellsWithValues(Game *game);
 
 /*imports a game from a file in Solve mode.*/
-Game* solve(char* fileName);
+Game* solve(Game *cur_game, char* fileName);
 
 /*imports a game from a file in Edit mode, if the file name provided is an empty string,
  * initializes a new game with 3x3 blocks board.*/
-Game* edit(char* fileName);
+Game* edit(Game *cur_game, char* fileName);
 
 /*exits the game cleanly, calls the freeGame function to clear the current game and
  * all the memory related to it*/
@@ -81,7 +81,9 @@ void copyGame(Game *game, Game *copy_game);
  * returns 1 if true and 0 otherwise*/
 int oneValidOption(int *arr,Game *game);
 
-/*returns 1 if the the game board solve successfully and 0 otherwise*/
+/*returns 1 if game board is solved and 0 otherwise*/
 int isWin(Game *game);
 
+/*changes the game mode to Init*/
+void changeToInit();
 #endif /* GAME_H_ */

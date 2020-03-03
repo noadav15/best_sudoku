@@ -84,7 +84,7 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 			printf("ERROR: too many parameters for solve\n");
 			return game;
 		}
-		out_game = solve(command[1]);
+		out_game = solve(game, command[1]);
 	}
 	else if(!strcmp(commandType, "edit")){
 		if(command_length > 2){
@@ -92,10 +92,10 @@ Game* processCommand(Game *game, char command[4][1024], int command_length){
 				return game;
 		}
 		if(command_length == 1){
-			out_game = edit("");
+			out_game = edit(game, "");
 		}
 		else{
-			out_game = edit(command[1]);
+			out_game = edit(game, command[1]);
 		}
 	}
 	else if(!strcmp(commandType, "mark_errors")){
@@ -406,10 +406,15 @@ Game* getCommand(Game *game, char input[1024], char command[4][1024]){
 		}
 		command_index++;
 		token = strtok(NULL, delim);
-		}
-		if(command_index == 0){
-			goto start;
-		}
-		return processCommand(game, command, command_index);
+	}
+	if(command_index == 0){
+		goto start;
+	}
+	if(game_status == Solve && isWin(game)){
+		changeToInit();
+		printf("The board is solved! Good job! :)\n");
+		printf("Game was set to Init mode\n");
+	}
+	return processCommand(game, command, command_index);
 }
 
