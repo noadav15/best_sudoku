@@ -103,7 +103,7 @@ Game* readFromFile(char* fileDir, int check_errors){
 	      else if(checkFormatFixed(token)){
 	    	  strncpy(value, token, strlen(token) - 1);
 	    	  converted_value = converStringToInt(value);
-	    	  if(converted_value >= 0 && converted_value <= board_size){
+	    	  if(converted_value >= 1 && converted_value <= board_size){
 				  (game->board)[y][x].value = converted_value;
 				  (game->board)[y][x].fixed = 1;
 	    	  }
