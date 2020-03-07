@@ -587,10 +587,10 @@ void freeGR(int sol_free){
 
 	if(sol_free){
 		free(sol);
+		free(vtype);
+		free(obj_value);
 	}
 	free(obj);
-	free(vtype);
-	free(obj_value);
 	GRBfreemodel(model);
 	GRBfreeenv(env);
 
