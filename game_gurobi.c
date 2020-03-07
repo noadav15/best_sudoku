@@ -353,8 +353,10 @@ int generate(Game *game, int X,int Y){
 				emptyYCells(game_sol,Y);
 				for(j=1;j<=game->board_size;j++){
 					for(k=1;k<=game->board_size;k++){
-						setCell(k,j,game_sol->board[j][k].value,game,first);
-						first=0;
+						if(game_sol->board[j][k].value!=game->board[j][k].value){
+							setCell(k,j,game_sol->board[j][k].value,game,first);
+							first=0;
+						}
 					}
 				}
 				freeGame(copy_game);
