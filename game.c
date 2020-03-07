@@ -230,11 +230,11 @@ int setCell(int x, int y, int z, Game *game, int start){
 	int max_value;
 	max_value = game->num_of_columns_in_block*game->num_of_rows_in_block;
 	if(x > game->board_size || x < 1){
-		printf("Error: column number is incorrect - out of range. Must be between 0 and %d.\n", game->board_size);
+		printf("Error: column number is incorrect - out of range. Must be between 1 and %d.\n", game->board_size);
 		return 0;
 	}
 	if(y > game->board_size || y < 1){
-		printf("Error: row number is incorrect - out of range. Must be between 0 and %d.\n", game->board_size);
+		printf("Error: row number is incorrect - out of range. Must be between 1 and %d.\n", game->board_size);
 		return 0;
 	}
 
