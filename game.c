@@ -256,62 +256,7 @@ int setCell(int x, int y, int z, Game *game, int start){
 	return 1;
 }
 
-/*receives a Move object and Undo = {0,1} (Undo == 1 -> Undo Move and Undo == 0 -> Redo Move).
- *changes the board accordingly until reaching the next move*/
-void setCellsByMove(Game *game, Move *move, int undo){
-	while(move->next != NULL && !move->next->move_start){
-		move = move->next;
-	}
-	while(1){
-		int y = move->row;
-		int x = move->column;
-		if(undo){
-			printf("undo: changed cell [%d][%d] back from %d to %d\n", x, y, move->after_value, move->before_value);
-			(game->board)[y][x].value = move->before_value;
-			(game->board)[y][x].fixed = move->fixed_before;
-		}
-		else{
-			printf("redo: changed cell [%d][%d] from %d to %d\n", x, y, move->before_value, move->after_value);
-			(game->board)[y][x].value = move->after_value;
-			(game->board)[y][x].fixed = move->fixed_after;
-		}
-		if(move->move_start){
-			break;
-		}
-		move = move->prev;
-	}
-}
 
-/*undo move*/
-int undoMove(Game *game){
-	Move *move = undo(game->move_history);
-	if(move == NULL){
-		printf("Error: no moves to undo\n");
-		return 0;
-	}
-	setCellsByMove(game, move, 1);
-	return 1;
-}
-
-/*redo move*/
-int redoMove(Game *game){
-	Move *move = redo(game->move_history);
-	if(move == NULL){
-		printf("Error: no moves to redo\n");
-		return 0;
-	}
-	setCellsByMove(game, move, 0);
-	return 1;
-}
-
-/*resets the board to it's first state according to it's move history*/
-void resetBoard(Game *game){
-	Move *move = undo(game->move_history);
-	while(move != NULL){
-		setCellsByMove(game, move, 1);
-		move = undo(game->move_history);
-	}
-}
 
 /*turns all cells with values to fixed cells*/
 void fixCellsWithValues(Game *game){
@@ -553,6 +498,64 @@ void save(Game *game, char* save_dir){
 		return;
 	}
 	saveToFile(game, save_dir);
+}
+
+/*receives a Move object and Undo = {0,1} (Undo == 1 -> Undo Move and Undo == 0 -> Redo Move).
+ *changes the board accordingly until reaching the next move*/
+void setCellsByMove(Game *game, Move *move, int undo){
+	while(move->next != NULL && !move->next->move_start){
+		move = move->next;
+	}
+	while(1){
+		int y = move->row;
+		int x = move->column;
+		if(undo){
+			printf("undo: changed cell [%d][%d] back from %d to %d\n", x, y, move->after_value, move->before_value);
+			(game->board)[y][x].value = move->before_value;
+			(game->board)[y][x].fixed = move->fixed_before;
+		}
+		else{
+			printf("redo: changed cell [%d][%d] from %d to %d\n", x, y, move->before_value, move->after_value);
+			(game->board)[y][x].value = move->after_value;
+			(game->board)[y][x].fixed = move->fixed_after;
+		}
+		if(move->move_start){
+			break;
+		}
+		move = move->prev;
+	}
+	markInvalidCells(game);
+}
+
+/*undo move*/
+int undoMove(Game *game){
+	Move *move = undo(game->move_history);
+	if(move == NULL){
+		printf("Error: no moves to undo\n");
+		return 0;
+	}
+	setCellsByMove(game, move, 1);
+	return 1;
+}
+
+/*redo move*/
+int redoMove(Game *game){
+	Move *move = redo(game->move_history);
+	if(move == NULL){
+		printf("Error: no moves to redo\n");
+		return 0;
+	}
+	setCellsByMove(game, move, 0);
+	return 1;
+}
+
+/*resets the board to it's first state according to it's move history*/
+void resetBoard(Game *game){
+	Move *move = undo(game->move_history);
+	while(move != NULL){
+		setCellsByMove(game, move, 1);
+		move = undo(game->move_history);
+	}
 }
 
 /*exits the game cleanly, calls the freeGame function to clear the current game and
