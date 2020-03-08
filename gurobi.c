@@ -565,7 +565,7 @@ void fillAllGuesses(Game *game,float X){
 /*prints the guesses corresponding to the received index*/
 void printGuessHint(Game *game, int row, int column){
 	int value,place,count;
-	printf("guess hint cell<%d,%d>:\n",column,row);
+	printf("guess hint cell <%d,%d>:\n",column,row);
 	for(value=1;value<=game->board_size;value++){
 		place=findPlaceForOption(row,column,value);
 		if(place!=-1 && sol[place]>0){
