@@ -24,9 +24,10 @@ int callGurobi(Game *game, int ILP){
 	if(value==-1){
 		return 2;
 	}
-	if(!createBounds()){
-		return -1;
-
+	if(ILP==0){
+		if(!createBounds()){
+			return -1;
+		}
 	}
 	if(!createEmptyModel()){
 		return -1;

@@ -464,19 +464,19 @@ int getHint(int row, int column, Game *game){
 
 /*finds the probabilities for values for the cell i,j */
 int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
-	int value,place, num_possible=0,k=0,current_k=0,stop,random;
-	float precent;
+	int value,place;
+	double random;
+	float precent,num_possible=0,sum=0 ;
 	float *arr_of_option_without_precent= (float*)calloc(game_sol->board_size+1,sizeof(float));
-	int *arr_of_option_precent;
 	if(arr_of_option_without_precent==NULL){
-			printf(ERRORMAL);
-			exit(0);
-		}
+		printf(ERRORMAL);
+		exit(0);
+	}
 	for(value=1;value<=game_sol->board_size;value++){
 		place=findPlaceForOption(i,j,value);
 		precent=sol[place];
 		if(precent>=X){
-			arr_of_option_without_precent[value]=sol[place];
+			arr_of_option_without_precent[value]=precent;
 		}
 		else{
 			arr_of_option_without_precent[value]=0;
@@ -485,7 +485,7 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 	for(value=1;value<=game_sol->board_size;value++){
 		game_sol->board[i][j].value=value;
 		if(boardValueAreValid(game_sol) && arr_of_option_without_precent[value]>0){
-			num_possible+=(1000*arr_of_option_without_precent[value]);
+			num_possible+=arr_of_option_without_precent[value];
 		}
 		else{
 			arr_of_option_without_precent[value]=0;
@@ -493,29 +493,24 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 		game_sol->board[i][j].value=0;
 	}
 	if(num_possible>0){
-		arr_of_option_precent=(int*)calloc(num_possible,sizeof(int));
-		if(arr_of_option_precent==NULL){
-					printf(ERRORMAL);
-					exit(0);
-				}
+		random= (double)rand();
+		random=random/RAND_MAX;
+		random=random*num_possible;
+		/*for(value1=1;value1<=game_sol->board_size;value1++){
+			printf("i=%d, j=%d, value=%d, precent=%f\n",i,j,value1,arr_of_option_without_precent[value1]);
+		}*/
 		for(value=1;value<=game_sol->board_size;value++){
-			if(arr_of_option_without_precent[value]>0){
-				place=findPlaceForOption(i,j,value);
-				stop=1000*sol[place]+k;
-				for(current_k=k; current_k<stop;current_k++){
-					arr_of_option_precent[current_k]=value;
-					k++;
-				}
+			if(random>=sum && random<= sum+arr_of_option_without_precent[value]){
+				break;
 			}
+			sum+=arr_of_option_without_precent[value];
 		}
-		random=rand()%num_possible;
-		value= arr_of_option_precent[random];
-		free(arr_of_option_precent);
 	}
 	else{
 		value=0;
 	}
 	free(arr_of_option_without_precent);
+	/*printf("i=%d, j=%d, value chose= %d, random=%f,num_possible=%f\n",i,j,value,random,num_possible);*/
 	return value;
 }
 
@@ -524,9 +519,6 @@ Game *findGuessBoard(Game *game,float X){
 	int i,j;
 	int value;
 	Game *game_sol= initializeGame(game->num_of_rows_in_block,game->num_of_columns_in_block);
-	if(X==0){
-		X=0.000000000001;
-	}
 	for(i =1; i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
 			game_sol->board[i][j].value=game->board[i][j].value;
@@ -550,7 +542,6 @@ Game *findGuessBoard(Game *game,float X){
 void fillAllGuesses(Game *game,float X){
 	Game *game_sol;
 	int i,j;
-
 	game_sol=findGuessBoard(game,X);
 	for(i=1;i<=game->board_size;i++){
 		for(j=1;j<=game->board_size;j++){
