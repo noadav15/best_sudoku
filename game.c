@@ -44,7 +44,7 @@ void printBlockRow(int i, Game *game){
 	printRowSepration(game);
 	for(k=i;k<i+game->num_of_rows_in_block;k++){
 		for(j=1;j<=game->board_size;j++){
-			if(j%game->num_of_columns_in_block==1){
+			if(j%game->num_of_columns_in_block==1 ||game->num_of_columns_in_block==1){
 				printf("|");
 			}
 			printCell(&(game->board[k][j]));

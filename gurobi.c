@@ -496,9 +496,6 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 		random= (double)rand();
 		random=random/RAND_MAX;
 		random=random*num_possible;
-		/*for(value1=1;value1<=game_sol->board_size;value1++){
-			printf("i=%d, j=%d, value=%d, precent=%f\n",i,j,value1,arr_of_option_without_precent[value1]);
-		}*/
 		for(value=1;value<=game_sol->board_size;value++){
 			if(random>=sum && random<= sum+arr_of_option_without_precent[value]){
 				break;
@@ -510,7 +507,6 @@ int getValueForCellByPrecent(Game *game_sol,int i, int j,float X){
 		value=0;
 	}
 	free(arr_of_option_without_precent);
-	/*printf("i=%d, j=%d, value chose= %d, random=%f,num_possible=%f\n",i,j,value,random,num_possible);*/
 	return value;
 }
 
@@ -531,7 +527,6 @@ Game *findGuessBoard(Game *game,float X){
 			if(game_sol->board[i][j].value==0){
 				value=getValueForCellByPrecent(game_sol, i, j,X);
 				game_sol->board[i][j].value=value;
-
 			}
 		}
 	}

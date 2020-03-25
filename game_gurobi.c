@@ -318,11 +318,11 @@ int fillXCells(Game *copy_game, int X){
 /*Generates a puzzle by randomly filling X empty cells with legal values,
 running ILP to solve the board, and then clearing all but Y random cells.*/
 int generate(Game *game, int X,int Y){
-	int value=0,valid,count,i,j,k, first=1;
+	int value=0,valid,count,i,j,k, first=1,number_to_earase=0;
 	Game *copy_game ;
 	Game *game_sol ;
 	count= numberOfEmptyCell(game);
-	if(X<0 || X>=count){
+	if(X<0 || X>count){
 		printf("first parameter not in range, should be between 0 and %d\n",count);
 		return 0;
 	}
@@ -350,8 +350,9 @@ int generate(Game *game, int X,int Y){
 			value=callGurobi(copy_game,1);
 			if(value==1){
 				game_sol= findHintBoard(copy_game);
-				/*empty Y cells*/
-				emptyYCells(game_sol,Y);
+				/*empty all but Y cells*/
+				number_to_earase=game_sol->board_size*game_sol->board_size-Y;
+				emptyYCells(game_sol,number_to_earase);
 				for(j=1;j<=game->board_size;j++){
 					for(k=1;k<=game->board_size;k++){
 						if(game_sol->board[j][k].value!=game->board[j][k].value){
